@@ -1,0 +1,107 @@
+.layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f9fafb;
+}
+
+.nav {
+  width: 220px;
+  flex-shrink: 0;
+  background: #1e1e2e;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+.navHeader {
+  padding: 24px 20px 16px;
+  border-bottom: 1px solid #2d2d42;
+}
+
+.navTitle {
+  font-size: 14px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.navSubtitle {
+  font-size: 11px;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+.navList {
+  list-style: none;
+  margin: 0;
+  padding: 12px 0;
+  flex: 1;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  font-size: 13px;
+  color: #9ca3af;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+
+.navItem:hover {
+  background: #2d2d42;
+  color: #fff;
+}
+
+.navItem.active {
+  background: #4f46e5;
+  color: #fff;
+}
+
+.frBadge {
+  font-size: 10px;
+  background: rgba(255,255,255,0.1);
+  padding: 1px 6px;
+  border-radius: 10px;
+}
+
+.navFooter {
+  padding: 16px 20px;
+  border-top: 1px solid #2d2d42;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.logoutBtn {
+  background: none;
+  border: 1px solid #374151;
+  color: #9ca3af;
+  border-radius: 8px;
+  padding: 7px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.logoutBtn:hover {
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.mainBtn {
+  background: none;
+  border: none;
+  color: #6b7280;
+  font-size: 12px;
+  cursor: pointer;
+  text-align: left;
+  padding: 4px 0;
+}
+
+.mainBtn:hover { color: #9ca3af; }
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+}

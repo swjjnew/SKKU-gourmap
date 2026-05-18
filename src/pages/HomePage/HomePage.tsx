@@ -1,50 +1,114 @@
+// FR-02~07: 캠퍼스별 메인 화면 (지도 + 리스트)
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import KakaoMap from '@components/map/KakaoMap';
-import RestaurantList from '@components/restaurant/RestaurantList';
-import Loading from '@components/common/Loading';
-import ErrorMessage from '@components/common/ErrorMessage';
-import { useRestaurants } from '@hooks/useRestaurants';
-import type { Restaurant } from '@/types';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import styles from './HomePage.module.css';
 
+const CAMPUS_LABELS: Record<string, string> = {
+  natural: '자연과학캠퍼스',
+  humanities: '인문사회캠퍼스',
+};
+
+/** 더미 식당 데이터 (프로토타입용) */
+const DUMMY_RESTAURANTS = [
+  { id: 1, name: '수원 맛집 A', category: '한식', priceRange: '보통', score: 4.2 },
+  { id: 2, name: '수원 맛집 B', category: '중식', priceRange: '저렴함', score: 3.8 },
+  { id: 3, name: '수원 맛집 C', category: '일식', priceRange: '비쌈', score: 4.7 },
+  { id: 4, name: '수원 맛집 D', category: '양식', priceRange: '보통', score: 4.0 },
+];
+
 /**
- * 메인 페이지.
- * 좌측: 맛집 리스트 / 우측: 카카오맵
- *
- * NOTE: 실제 디자인이 정해지면 레이아웃을 그대로 두거나
- *       모바일 대응(바텀시트 등)을 추가하면 됩니다.
+ * HomePage
+ * /campus/:slug — 좌측 필터+리스트, 우측 지도 영역 (FR-02~07)
  */
 function HomePage() {
+  const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const { restaurants, loading, error, refetch } = useRestaurants();
-  const [selectedId, setSelectedId] = useState<Restaurant['id'] | null>(null);
-
-  const handleSelect = (r: Restaurant) => {
-    setSelectedId(r.id);
-  };
-
-  const handleOpenDetail = (r: Restaurant) => {
-    navigate(`/restaurants/${r.id}`);
-  };
+  const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
+  const campusLabel = CAMPUS_LABELS[slug ?? ''] ?? slug;
 
   return (
     <div className={styles.page}>
-      <aside className={styles.sidebar}>
-        <h2 className={styles.heading}>맛집 목록</h2>
-        {loading && <Loading />}
-        {error && <ErrorMessage message={error} onRetry={refetch} />}
-        {!loading && !error && (
-          <RestaurantList
-            restaurants={restaurants}
-            selectedId={selectedId}
-            onItemClick={handleOpenDetail}
-          />
-        )}
-      </aside>
-      <section className={styles.mapArea}>
-        <KakaoMap restaurants={restaurants} onMarkerClick={handleSelect} />
-      </section>
+      {/* 상단 헤더 바 */}
+      <header className={styles.header}>
+        <button className={styles.backBtn} onClick={() => navigate('/')}>← 캠퍼스 선택</button>
+        <span className={styles.campusTitle}>{campusLabel} 맛집 지도</span>
+        <div className={styles.viewToggle}>
+          <button
+            className={`${styles.toggleBtn} ${viewMode === 'map' ? styles.active : ''}`}
+            onClick={() => setViewMode('map')}
+          >지도</button>
+          <button
+            className={`${styles.toggleBtn} ${viewMode === 'list' ? styles.active : ''}`}
+            onClick={() => setViewMode('list')}
+          >리스트</button>
+          <Link className={styles.listOnlyLink} to={`/campus/${slug}/list`}>
+            리스트 전용 →
+          </Link>
+        </div>
+      </header>
+
+      <div className={styles.body}>
+        {/* 사이드바: 필터 + 식당 목록 */}
+        <aside className={styles.sidebar}>
+          {/* 필터 패널 플레이스홀더 (FR-06) */}
+          <div className={styles.section}>
+            <div className={styles.sectionBadge}>FR-06</div>
+            <div className={styles.filterPlaceholder}>
+              <strong>필터 패널 영역</strong>
+              <p>음식 종류 / 가격대 / 분위기 / 주차 / 웨이팅<br />URL 쿼리 파라미터와 동기화</p>
+              <div className={styles.filterChips}>
+                {['음식 종류', '가격대', '분위기', '주차', '웨이팅'].map(f => (
+                  <span key={f} className={styles.chip}>{f}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* 식당 리스트 (FR-02~04, FR-07~08) */}
+          <div className={styles.section}>
+            <div className={styles.sectionBadge}>FR-02~04 · FR-07~08</div>
+            <strong className={styles.sectionTitle}>식당 목록 (추천 점수 정렬)</strong>
+            <ul className={styles.restaurantList}>
+              {DUMMY_RESTAURANTS.map(r => (
+                <li
+                  key={r.id}
+                  className={styles.restaurantItem}
+                  onClick={() => navigate(`/restaurants/${r.id}`)}
+                >
+                  <div className={styles.rName}>{r.name}</div>
+                  <div className={styles.rMeta}>
+                    <span className={styles.rCategory}>{r.category}</span>
+                    <span className={styles.rPrice}>{r.priceRange}</span>
+                    <span className={styles.rScore}>★ {r.score}</span>
+                  </div>
+                  <div className={styles.rReason}>
+                    {/* FR-08: 추천 근거 칩 플레이스홀더 */}
+                    <span className={styles.reasonChip}>추천 근거 칩 (FR-08)</span>
+                    <span className={styles.reasonChip}>AI 요약 문장</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </aside>
+
+        {/* 지도 영역 플레이스홀더 */}
+        <section className={styles.mapArea}>
+          <div className={styles.mapPlaceholder}>
+            <div className={styles.mapBadge}>FR-02~03</div>
+            <div className={styles.mapIcon}>🗺️</div>
+            <strong>카카오맵 영역</strong>
+            <p>
+              {campusLabel} 식당 마커 표시<br />
+              마커 클릭 시 오버레이 (이름·점수·태그·요약)<br />
+              지도 이동/줌 시 식당 재조회 (300ms 디바운스)
+            </p>
+            <div className={styles.mapNote}>
+              SDK 로드 실패 시 → <Link to={`/campus/${slug}/list`}>"리스트 보기" CTA</Link>
+            </div>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }

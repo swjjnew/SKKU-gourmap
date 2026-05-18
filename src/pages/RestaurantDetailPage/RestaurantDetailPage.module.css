@@ -1,68 +1,265 @@
 .page {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 24px 16px;
-  overflow-y: auto;
-  height: 100%;
-}
-
-.back {
-  display: inline-block;
-  margin-bottom: 12px;
-  color: #3b82f6;
-  text-decoration: none;
-  font-size: 14px;
-}
-.back:hover {
-  text-decoration: underline;
-}
-
-.title {
-  margin: 0 0 8px;
-  font-size: 24px;
-  font-weight: 700;
-  color: #111827;
-}
-
-.meta {
+  min-height: 100vh;
+  background: #f9fafb;
   display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  align-items: center;
   gap: 12px;
+  padding: 12px 24px;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
+}
+
+.backBtn {
+  background: none;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #374151;
+}
+
+.backBtn:hover { background: #f3f4f6; }
+
+.badge {
+  background: #e0e7ff;
+  color: #4338ca;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.main {
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* 히어로 섹션 */
+.heroSection {
+  display: flex;
+  gap: 20px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid #e5e7eb;
+}
+
+.heroImage {
+  width: 160px;
+  height: 120px;
+  flex-shrink: 0;
+  background: #f3f4f6;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  color: #9ca3af;
+  gap: 4px;
+}
+
+.heroImage span {
+  font-size: 11px;
+}
+
+.heroInfo {
+  flex: 1;
+}
+
+.restaurantName {
+  font-size: 22px;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 10px;
+}
+
+.metaRow {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
   flex-wrap: wrap;
-  color: #4b5563;
-  font-size: 14px;
-  margin-bottom: 16px;
 }
 
 .category {
   background: #eff6ff;
   color: #1d4ed8;
-  padding: 2px 8px;
-  border-radius: 12px;
   font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 20px;
 }
 
-.thumb {
-  width: 100%;
-  max-height: 320px;
-  object-fit: cover;
-  border-radius: 12px;
-  margin-bottom: 16px;
-}
+.price { font-size: 13px; color: #059669; }
+.score { font-size: 13px; color: #d97706; }
 
-.section {
-  margin-bottom: 20px;
-}
-
-.section h3 {
-  font-size: 14px;
-  font-weight: 600;
+.address, .hours, .phone {
+  font-size: 13px;
   color: #6b7280;
-  margin: 0 0 6px;
+  margin: 4px 0 0;
 }
 
-.section p {
-  margin: 0;
-  font-size: 15px;
-  color: #111827;
-  line-height: 1.5;
+/* 카드 공통 */
+.card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 18px 20px;
+  border: 1px solid #e5e7eb;
 }
+
+.cardBadge {
+  display: inline-block;
+  background: #f3f4f6;
+  color: #6b7280;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  margin-bottom: 10px;
+}
+
+.cardTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 14px;
+}
+
+/* 추천 근거 칩 */
+.reasonChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.reasonChip {
+  background: #fef3c7;
+  color: #92400e;
+  font-size: 13px;
+  padding: 5px 14px;
+  border-radius: 20px;
+}
+
+/* AI 요약 */
+.aiSummary {
+  font-size: 14px;
+  color: #374151;
+  line-height: 1.7;
+  margin: 0 0 12px;
+  padding: 12px;
+  background: #f0f9ff;
+  border-radius: 8px;
+  border-left: 3px solid #38bdf8;
+}
+
+.noAnalysis {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #9ca3af;
+  padding: 8px 12px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px dashed #e5e7eb;
+}
+
+.noAnalysisBadge {
+  background: #f3f4f6;
+  color: #6b7280;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+/* 핵심 리뷰 포인트 */
+.reviewPoints {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reviewPoint {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.pointLabel {
+  font-weight: 600;
+  color: #374151;
+  width: 48px;
+  font-size: 13px;
+}
+
+.pointScore {
+  color: #d97706;
+  font-size: 13px;
+  font-weight: 600;
+  width: 50px;
+}
+
+.pointDesc {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* 추천 점수 */
+.scoreDisplay {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.bigScore {
+  font-size: 48px;
+  font-weight: 800;
+  color: #2563eb;
+}
+
+.scoreDesc {
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+/* 에러 카드 */
+.errorCard {
+  border-color: #fecaca;
+  background: #fff5f5;
+}
+
+.errorDesc {
+  font-size: 13px;
+  color: #991b1b;
+  margin: 0 0 12px;
+}
+
+.retryBtn {
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 20px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.retryBtn:hover { background: #dc2626; }

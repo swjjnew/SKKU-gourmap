@@ -1,0 +1,124 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf0 100%);
+  padding: 24px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 48px 40px;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.badge {
+  display: inline-block;
+  background: #e8f4ff;
+  color: #2563eb;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-bottom: 16px;
+  letter-spacing: 0.05em;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 800;
+  color: #1a1a2e;
+  margin: 0 0 8px;
+}
+
+.subtitle {
+  font-size: 16px;
+  color: #6b7280;
+  margin: 0 0 8px;
+}
+
+.desc {
+  font-size: 15px;
+  color: #374151;
+  margin: 0 0 36px;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.campusBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 24px;
+  border: 2px solid transparent;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  font-family: inherit;
+}
+
+.campusBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.natural {
+  background: #f0fdf4;
+  border-color: #86efac;
+}
+
+.natural:hover {
+  background: #dcfce7;
+  border-color: #4ade80;
+}
+
+.humanities {
+  background: #eff6ff;
+  border-color: #93c5fd;
+}
+
+.humanities:hover {
+  background: #dbeafe;
+  border-color: #60a5fa;
+}
+
+.campusIcon {
+  font-size: 28px;
+}
+
+.campusName {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.campusDetail {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.adminLink {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: color 0.15s;
+}
+
+.adminLink:hover {
+  color: #6b7280;
+}
