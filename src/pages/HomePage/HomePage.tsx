@@ -1,14 +1,12 @@
 // FR-02~07: 캠퍼스별 메인 화면 (지도 + 리스트)
 import { useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
+import KakaoMap from '@components/map/KakaoMap';
+import { CAMPUS_CENTERS, DEFAULT_CAMPUS, type CampusSlug } from '@config/mapConfig';
+import type { Restaurant } from '@/types';
 import styles from './HomePage.module.css';
 
-const CAMPUS_LABELS: Record<string, string> = {
-  natural: '자연과학캠퍼스',
-  humanities: '인문사회캠퍼스',
-};
-
-/** 더미 식당 데이터 (프로토타입용) */
+/** 더미 식당 데이터 (API 연결 전 임시) */
 const DUMMY_RESTAURANTS = [
   { id: 1, name: '수원 맛집 A', category: '한식', priceRange: '보통', score: 4.2 },
   { id: 2, name: '수원 맛집 B', category: '중식', priceRange: '저렴함', score: 3.8 },
@@ -18,20 +16,27 @@ const DUMMY_RESTAURANTS = [
 
 /**
  * HomePage
- * /campus/:slug — 좌측 필터+리스트, 우측 지도 영역 (FR-02~07)
+ * /campus/:slug — 좌측 필터+리스트, 우측 카카오맵 (FR-02~07)
  */
 function HomePage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
-  const campusLabel = CAMPUS_LABELS[slug ?? ''] ?? slug;
+
+  // slug 가 유효하지 않으면 natural 로 fallback
+  const campusKey = (slug && slug in CAMPUS_CENTERS ? slug : DEFAULT_CAMPUS) as CampusSlug;
+  const campus = CAMPUS_CENTERS[campusKey];
+
+  const handleMarkerClick = (restaurant: Restaurant) => {
+    navigate(`/restaurants/${restaurant.id}`);
+  };
 
   return (
     <div className={styles.page}>
       {/* 상단 헤더 바 */}
       <header className={styles.header}>
         <button className={styles.backBtn} onClick={() => navigate('/')}>← 캠퍼스 선택</button>
-        <span className={styles.campusTitle}>{campusLabel} 맛집 지도</span>
+        <span className={styles.campusTitle}>{campus.label} 맛집 지도</span>
         <div className={styles.viewToggle}>
           <button
             className={`${styles.toggleBtn} ${viewMode === 'map' ? styles.active : ''}`}
@@ -82,9 +87,8 @@ function HomePage() {
                     <span className={styles.rScore}>★ {r.score}</span>
                   </div>
                   <div className={styles.rReason}>
-                    {/* FR-08: 추천 근거 칩 플레이스홀더 */}
                     <span className={styles.reasonChip}>추천 근거 칩 (FR-08)</span>
-                    <span className={styles.reasonChip}>AI 요약 문장</span>
+                    <span className={styles.reasonChip}>AI 요약</span>
                   </div>
                 </li>
               ))}
@@ -92,21 +96,14 @@ function HomePage() {
           </div>
         </aside>
 
-        {/* 지도 영역 플레이스홀더 */}
+        {/* 카카오맵 */}
         <section className={styles.mapArea}>
-          <div className={styles.mapPlaceholder}>
-            <div className={styles.mapBadge}>FR-02~03</div>
-            <div className={styles.mapIcon}>🗺️</div>
-            <strong>카카오맵 영역</strong>
-            <p>
-              {campusLabel} 식당 마커 표시<br />
-              마커 클릭 시 오버레이 (이름·점수·태그·요약)<br />
-              지도 이동/줌 시 식당 재조회 (300ms 디바운스)
-            </p>
-            <div className={styles.mapNote}>
-              SDK 로드 실패 시 → <Link to={`/campus/${slug}/list`}>"리스트 보기" CTA</Link>
-            </div>
-          </div>
+          <KakaoMap
+            center={{ lat: campus.lat, lng: campus.lng }}
+            level={campus.level}
+            restaurants={[]}
+            onMarkerClick={handleMarkerClick}
+          />
         </section>
       </div>
     </div>

@@ -12,12 +12,33 @@ export const KAKAO_MAP_SDK_URL = (appkey: string) =>
   `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${appkey}&autoload=false&libraries=services,clusterer`;
 
 /**
- * 지도 초기 중심 좌표.
- * 기본값은 성균관대학교 자연과학캠퍼스(율전) - 추후 인문사회캠퍼스(명륜)와 분기 가능.
+ * 캠퍼스별 지도 중심 좌표 및 기본 줌 레벨.
+ * slug 는 React Router 의 /campus/:slug 와 동일하게 맞춥니다.
  */
+export const CAMPUS_CENTERS = {
+  natural: {
+    lat: 37.296364404283516,
+    lng: 126.9708791573265,
+    level: 4,
+    label: '자연과학캠퍼스',
+  },
+  humanities: {
+    lat: 37.58761640986565,
+    lng: 126.99372749860636,
+    level: 4,
+    label: '인문사회캠퍼스',
+  },
+} as const;
+
+export type CampusSlug = keyof typeof CAMPUS_CENTERS;
+
+/** slug 가 유효하지 않을 때 사용하는 fallback */
+export const DEFAULT_CAMPUS: CampusSlug = 'natural';
+
+/** 하위 호환용 — KakaoMap 등 기존 코드가 참조하는 기본 중심 좌표 */
 export const DEFAULT_MAP_CENTER = {
-  lat: 37.2939,
-  lng: 126.9769,
+  lat: CAMPUS_CENTERS[DEFAULT_CAMPUS].lat,
+  lng: CAMPUS_CENTERS[DEFAULT_CAMPUS].lng,
 } as const;
 
 /**
