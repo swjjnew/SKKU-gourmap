@@ -5,6 +5,7 @@
   flex-direction: column;
 }
 
+/* ── 헤더 ── */
 .header {
   display: flex;
   align-items: center;
@@ -24,18 +25,36 @@
   cursor: pointer;
   color: #374151;
 }
-
 .backBtn:hover { background: #f3f4f6; }
 
-.badge {
-  background: #e0e7ff;
-  color: #4338ca;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 3px 10px;
-  border-radius: 20px;
+.loadingBadge {
+  font-size: 12px;
+  color: #9ca3af;
 }
 
+/* ── 에러 배너 ── */
+.errorBanner {
+  background: #fef2f2;
+  border-bottom: 1px solid #fecaca;
+  padding: 10px 24px;
+  font-size: 13px;
+  color: #991b1b;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.retryInline {
+  background: none;
+  border: 1px solid #fca5a5;
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-size: 12px;
+  color: #dc2626;
+  cursor: pointer;
+}
+.retryInline:hover { background: #fee2e2; }
+
+/* ── 본문 ── */
 .main {
   max-width: 720px;
   width: 100%;
@@ -43,10 +62,10 @@
   padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
-/* 히어로 섹션 */
+/* ── 히어로 ── */
 .heroSection {
   display: flex;
   gap: 20px;
@@ -57,30 +76,29 @@
 }
 
 .heroImage {
-  width: 160px;
-  height: 120px;
+  width: 140px;
+  height: 110px;
   flex-shrink: 0;
   background: #f3f4f6;
   border-radius: 10px;
+  overflow: hidden;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: 32px;
-  color: #9ca3af;
-  gap: 4px;
+}
+.heroImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.heroPlaceholder {
+  font-size: 36px;
 }
 
-.heroImage span {
-  font-size: 11px;
-}
-
-.heroInfo {
-  flex: 1;
-}
+.heroInfo { flex: 1; min-width: 0; }
 
 .restaurantName {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 800;
   color: #111827;
   margin: 0 0 10px;
@@ -91,6 +109,7 @@
   gap: 8px;
   margin-bottom: 10px;
   flex-wrap: wrap;
+  align-items: center;
 }
 
 .category {
@@ -100,91 +119,95 @@
   padding: 3px 10px;
   border-radius: 20px;
 }
-
 .price { font-size: 13px; color: #059669; }
-.score { font-size: 13px; color: #d97706; }
+.score { font-size: 14px; font-weight: 700; }
 
-.address, .hours, .phone {
+.infoRow {
   font-size: 13px;
   color: #6b7280;
   margin: 4px 0 0;
 }
+.closed { color: #9ca3af; }
 
-/* 카드 공통 */
+.badgeRow {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.infoBadge {
+  background: #ecfdf5;
+  color: #065f46;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid #a7f3d0;
+}
+.infoBadgeWait {
+  background: #fff7ed;
+  color: #92400e;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid #fde68a;
+}
+
+.tagRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+/* ── 공통 카드 ── */
 .card {
   background: #fff;
   border-radius: 14px;
   padding: 18px 20px;
   border: 1px solid #e5e7eb;
 }
-
-.cardBadge {
-  display: inline-block;
-  background: #f3f4f6;
-  color: #6b7280;
-  font-size: 10px;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 20px;
-  margin-bottom: 10px;
-}
-
 .cardTitle {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   color: #111827;
   margin: 0 0 14px;
 }
 
-/* 추천 근거 칩 */
-.reasonChips {
+/* ── 이미지 갤러리 ── */
+.gallery {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
 }
-
-.reasonChip {
-  background: #fef3c7;
-  color: #92400e;
-  font-size: 13px;
-  padding: 5px 14px;
-  border-radius: 20px;
+.galleryImg {
+  width: 140px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+  cursor: pointer;
 }
+.galleryImg:hover { opacity: 0.88; }
 
-/* AI 요약 */
+/* ── AI 요약 ── */
 .aiSummary {
   font-size: 14px;
   color: #374151;
-  line-height: 1.7;
-  margin: 0 0 12px;
-  padding: 12px;
+  line-height: 1.75;
+  margin: 0 0 10px;
+  padding: 12px 14px;
   background: #f0f9ff;
   border-radius: 8px;
   border-left: 3px solid #38bdf8;
 }
-
-.noAnalysis {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
+.analysisMeta {
+  font-size: 11px;
   color: #9ca3af;
-  padding: 8px 12px;
-  background: #f9fafb;
-  border-radius: 8px;
-  border: 1px dashed #e5e7eb;
+  margin: 0;
 }
 
-.noAnalysisBadge {
-  background: #f3f4f6;
-  color: #6b7280;
-  font-size: 10px;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 10px;
-}
-
-/* 핵심 리뷰 포인트 */
+/* ── 핵심 리뷰 포인트 ── */
 .reviewPoints {
   list-style: none;
   margin: 0;
@@ -193,73 +216,76 @@
   flex-direction: column;
   gap: 10px;
 }
-
 .reviewPoint {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 14px;
-  background: #f9fafb;
-  border-radius: 8px;
 }
-
 .pointLabel {
   font-weight: 600;
   color: #374151;
-  width: 48px;
+  width: 44px;
   font-size: 13px;
+  flex-shrink: 0;
 }
-
+.pointBar {
+  flex: 1;
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.pointBarFill {
+  height: 100%;
+  background: #2563eb;
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
 .pointScore {
   color: #d97706;
   font-size: 13px;
   font-weight: 600;
-  width: 50px;
+  width: 44px;
+  flex-shrink: 0;
+  text-align: right;
 }
-
 .pointDesc {
-  font-size: 13px;
+  font-size: 12px;
   color: #6b7280;
+  width: 160px;
+  flex-shrink: 0;
 }
 
-/* 추천 점수 */
+/* ── 추천 점수 ── */
 .scoreDisplay {
   display: flex;
   align-items: baseline;
-  gap: 10px;
+  gap: 8px;
 }
-
 .bigScore {
-  font-size: 48px;
+  font-size: 52px;
   font-weight: 800;
-  color: #2563eb;
+  line-height: 1;
 }
-
 .scoreDesc {
-  font-size: 13px;
+  font-size: 14px;
   color: #9ca3af;
 }
 
-/* 에러 카드 */
-.errorCard {
-  border-color: #fecaca;
-  background: #fff5f5;
-}
-
-.errorDesc {
-  font-size: 13px;
-  color: #991b1b;
-  margin: 0 0 12px;
-}
-
-.retryBtn {
-  background: #ef4444;
-  color: #fff;
-  border: none;
+/* ── 분석 없음 ── */
+.noAnalysis {
+  font-size: 14px;
+  color: #9ca3af;
+  padding: 16px;
+  background: #f9fafb;
   border-radius: 8px;
-  padding: 8px 20px;
-  font-size: 13px;
-  cursor: pointer;
+  border: 1px dashed #e5e7eb;
+  text-align: center;
 }
 
-.retryBtn:hover { background: #dc2626; }
+/* ── 반응형 ── */
+@media (max-width: 600px) {
+  .heroSection { flex-direction: column; }
+  .heroImage { width: 100%; height: 160px; }
+  .pointDesc { display: none; }
+}

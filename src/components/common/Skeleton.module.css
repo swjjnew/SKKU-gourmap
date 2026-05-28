@@ -1,0 +1,162 @@
+/* shimmer 애니메이션 */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.base {
+  background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite linear;
+  border-radius: 6px;
+}
+
+/* ── RestaurantCard 스켈레톤 ── */
+.card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cardTitleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.cardTitle {
+  composes: base;
+  height: 16px;
+  flex: 1;
+}
+
+.cardScore {
+  composes: base;
+  width: 36px;
+  height: 16px;
+}
+
+.cardMeta {
+  composes: base;
+  height: 12px;
+  width: 60%;
+}
+
+.cardTagRow {
+  display: flex;
+  gap: 6px;
+}
+
+.cardTag {
+  composes: base;
+  height: 20px;
+  width: 56px;
+  border-radius: 20px;
+}
+
+.cardSummary {
+  composes: base;
+  height: 12px;
+  width: 90%;
+}
+
+.cardSummary2 {
+  composes: base;
+  height: 12px;
+  width: 70%;
+}
+
+/* ── 상세 페이지 스켈레톤 ── */
+.detailHero {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  gap: 20px;
+}
+
+.detailThumb {
+  composes: base;
+  width: 140px;
+  height: 110px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.detailInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.detailName {
+  composes: base;
+  height: 22px;
+  width: 55%;
+}
+
+.detailMetaRow {
+  display: flex;
+  gap: 8px;
+}
+
+.detailMeta {
+  composes: base;
+  height: 14px;
+  width: 60px;
+  border-radius: 20px;
+}
+
+.detailLine {
+  composes: base;
+  height: 12px;
+  width: 80%;
+}
+
+.detailLine2 {
+  composes: base;
+  height: 12px;
+  width: 55%;
+}
+
+/* ── 카드 블록 스켈레톤 ── */
+.block {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.blockTitle {
+  composes: base;
+  height: 15px;
+  width: 30%;
+}
+
+.blockLine {
+  composes: base;
+  height: 12px;
+  width: 100%;
+}
+
+.blockLine2 {
+  composes: base;
+  height: 12px;
+  width: 80%;
+}
+
+.blockLine3 {
+  composes: base;
+  height: 12px;
+  width: 90%;
+}

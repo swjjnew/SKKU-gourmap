@@ -19,13 +19,13 @@ export const CAMPUS_CENTERS = {
   natural: {
     lat: 37.296364404283516,
     lng: 126.9708791573265,
-    level: 4,
+    level: 2,
     label: '자연과학캠퍼스',
   },
   humanities: {
     lat: 37.58761640986565,
     lng: 126.99372749860636,
-    level: 4,
+    level: 2,
     label: '인문사회캠퍼스',
   },
 } as const;
@@ -44,7 +44,7 @@ export const DEFAULT_MAP_CENTER = {
 /**
  * 지도 초기 줌 레벨 (카카오맵 기준 1~14, 숫자가 작을수록 확대).
  */
-export const DEFAULT_MAP_LEVEL = 4;
+export const DEFAULT_MAP_LEVEL = 2;
 
 /**
  * 마커 클러스터링 활성화 임계 줌 레벨.

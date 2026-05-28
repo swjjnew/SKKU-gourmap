@@ -1,111 +1,169 @@
 // FR-02~07: 캠퍼스별 메인 화면 (지도 + 리스트)
-import { useState } from 'react';
-import { useNavigate, useParams, Link } from 'react-router-dom';
-import KakaoMap from '@components/map/KakaoMap';
+import { useState, useCallback } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import KakaoMap, { type MapBounds } from '@components/map/KakaoMap';
+import RestaurantCard from '@components/restaurant/RestaurantCard';
+import { FilterPanel } from '@components/filter/FilterPanel';
+import { ErrorBoundary } from '@components/common/ErrorBoundary';
+import { EmptyState } from '@components/common/EmptyState';
+import { RestaurantListSkeleton } from '@components/common/Skeleton';
+import ErrorMessage from '@components/common/ErrorMessage';
 import { CAMPUS_CENTERS, DEFAULT_CAMPUS, type CampusSlug } from '@config/mapConfig';
-import type { Restaurant } from '@/types';
+import { fetchRestaurantsByCampus, fetchRecommendations } from '@services/restaurantService';
+import { useFilterParams } from '@hooks/useFilterParams';
+import type { RestaurantListItem } from '@/types';
 import styles from './HomePage.module.css';
 
-/** 더미 식당 데이터 (API 연결 전 임시) */
-const DUMMY_RESTAURANTS = [
-  { id: 1, name: '수원 맛집 A', category: '한식', priceRange: '보통', score: 4.2 },
-  { id: 2, name: '수원 맛집 B', category: '중식', priceRange: '저렴함', score: 3.8 },
-  { id: 3, name: '수원 맛집 C', category: '일식', priceRange: '비쌈', score: 4.7 },
-  { id: 4, name: '수원 맛집 D', category: '양식', priceRange: '보통', score: 4.0 },
-];
-
-/**
- * HomePage
- * /campus/:slug — 좌측 필터+리스트, 우측 카카오맵 (FR-02~07)
- */
 function HomePage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
 
-  // slug 가 유효하지 않으면 natural 로 fallback
+  const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+
   const campusKey = (slug && slug in CAMPUS_CENTERS ? slug : DEFAULT_CAMPUS) as CampusSlug;
   const campus = CAMPUS_CENTERS[campusKey];
 
-  const handleMarkerClick = (restaurant: Restaurant) => {
-    navigate(`/restaurants/${restaurant.id}`);
-  };
+  // 필터 상태 (URL 쿼리 파라미터)
+  const { filter, setFilter, resetFilter, hasFilter, toRestaurantFilter } = useFilterParams();
+
+  // ── 식당 목록: 필터 없으면 전체조회, 있으면 추천 API ────────────
+  const baseQuery = useQuery({
+    queryKey: ['restaurants', 'byCampus', campusKey],
+    queryFn: () => fetchRestaurantsByCampus(campusKey),
+    enabled: !hasFilter,
+    staleTime: 60_000,
+  });
+
+  const filteredQuery = useQuery({
+    queryKey: ['restaurants', 'recommendations', campusKey, toRestaurantFilter()],
+    queryFn: () => fetchRecommendations(campusKey, toRestaurantFilter()),
+    enabled: hasFilter,
+    staleTime: 60_000,
+  });
+
+  const activeQuery  = hasFilter ? filteredQuery : baseQuery;
+  const restaurants: RestaurantListItem[] = activeQuery.data ?? [];
+  const { isLoading, isError, error: queryError } = activeQuery;
+
+  // ── 이벤트 핸들러 ──────────────────────────────────────────────
+  const handleMarkerClick = useCallback((r: RestaurantListItem) => {
+    setSelectedId(r.id);
+    navigate(`/restaurants/${r.id}`);
+  }, [navigate]);
+
+  const handleCardClick = useCallback((r: RestaurantListItem) => {
+    setSelectedId(r.id);
+    navigate(`/restaurants/${r.id}`);
+  }, [navigate]);
+
+  const handleBoundsChange = useCallback((_bounds: MapBounds) => {
+    // Phase 4에서 bounds 기반 추가 조회로 확장 예정
+  }, []);
+
+  // ── 필터 + 리스트 블록 (지도/리스트 모드 공용) ─────────────────
+  const listContent = (
+    <>
+      <FilterPanel
+        filter={filter}
+        hasFilter={hasFilter}
+        onChange={setFilter}
+        onReset={resetFilter}
+      />
+
+      <div className={styles.listSection}>
+        <strong className={styles.sectionTitle}>
+          {hasFilter ? '추천 식당' : '식당 목록'}
+          {!isLoading && restaurants.length > 0 && (
+            <span className={styles.count}> {restaurants.length}개</span>
+          )}
+        </strong>
+
+        {isLoading && <RestaurantListSkeleton count={4} />}
+
+        {isError && (
+          <ErrorMessage
+            message={
+              queryError instanceof Error
+                ? queryError.message
+                : '식당 목록을 불러올 수 없습니다.'
+            }
+          />
+        )}
+
+        {!isLoading && !isError && restaurants.length === 0 && (
+          <EmptyState
+            message="조건에 맞는 식당이 없습니다"
+            description={hasFilter ? '필터를 바꿔보거나 초기화해 보세요.' : undefined}
+            resetLabel={hasFilter ? '필터 초기화' : null}
+            onReset={resetFilter}
+          />
+        )}
+
+        <ul className={styles.restaurantList}>
+          {restaurants.map((r) => (
+            <li key={r.id}>
+              <RestaurantCard
+                restaurant={r}
+                selected={r.id === selectedId}
+                onClick={() => handleCardClick(r)}
+              />
+            </li>
+          ))}
+        </ul>
+      </div>
+    </>
+  );
 
   return (
     <div className={styles.page}>
-      {/* 상단 헤더 바 */}
       <header className={styles.header}>
-        <button className={styles.backBtn} onClick={() => navigate('/')}>← 캠퍼스 선택</button>
+        <button className={styles.backBtn} onClick={() => navigate('/')}>
+          ← 캠퍼스 선택
+        </button>
         <span className={styles.campusTitle}>{campus.label} 맛집 지도</span>
         <div className={styles.viewToggle}>
           <button
             className={`${styles.toggleBtn} ${viewMode === 'map' ? styles.active : ''}`}
             onClick={() => setViewMode('map')}
-          >지도</button>
+          >
+            지도
+          </button>
           <button
             className={`${styles.toggleBtn} ${viewMode === 'list' ? styles.active : ''}`}
             onClick={() => setViewMode('list')}
-          >리스트</button>
-          <Link className={styles.listOnlyLink} to={`/campus/${slug}/list`}>
-            리스트 전용 →
-          </Link>
+          >
+            리스트
+          </button>
         </div>
       </header>
 
-      <div className={styles.body}>
-        {/* 사이드바: 필터 + 식당 목록 */}
-        <aside className={styles.sidebar}>
-          {/* 필터 패널 플레이스홀더 (FR-06) */}
-          <div className={styles.section}>
-            <div className={styles.sectionBadge}>FR-06</div>
-            <div className={styles.filterPlaceholder}>
-              <strong>필터 패널 영역</strong>
-              <p>음식 종류 / 가격대 / 분위기 / 주차 / 웨이팅<br />URL 쿼리 파라미터와 동기화</p>
-              <div className={styles.filterChips}>
-                {['음식 종류', '가격대', '분위기', '주차', '웨이팅'].map(f => (
-                  <span key={f} className={styles.chip}>{f}</span>
-                ))}
-              </div>
-            </div>
-          </div>
+      {viewMode === 'map' && (
+        <div className={styles.body}>
+          <aside className={styles.sidebar}>
+            {listContent}
+          </aside>
+          <section className={styles.mapArea}>
+            <ErrorBoundary name="map" retryLabel="지도 다시 로드">
+              <KakaoMap
+                center={{ lat: campus.lat, lng: campus.lng }}
+                level={campus.level}
+                restaurants={restaurants}
+                selectedId={selectedId}
+                onMarkerClick={handleMarkerClick}
+                onBoundsChange={handleBoundsChange}
+              />
+            </ErrorBoundary>
+          </section>
+        </div>
+      )}
 
-          {/* 식당 리스트 (FR-02~04, FR-07~08) */}
-          <div className={styles.section}>
-            <div className={styles.sectionBadge}>FR-02~04 · FR-07~08</div>
-            <strong className={styles.sectionTitle}>식당 목록 (추천 점수 정렬)</strong>
-            <ul className={styles.restaurantList}>
-              {DUMMY_RESTAURANTS.map(r => (
-                <li
-                  key={r.id}
-                  className={styles.restaurantItem}
-                  onClick={() => navigate(`/restaurants/${r.id}`)}
-                >
-                  <div className={styles.rName}>{r.name}</div>
-                  <div className={styles.rMeta}>
-                    <span className={styles.rCategory}>{r.category}</span>
-                    <span className={styles.rPrice}>{r.priceRange}</span>
-                    <span className={styles.rScore}>★ {r.score}</span>
-                  </div>
-                  <div className={styles.rReason}>
-                    <span className={styles.reasonChip}>추천 근거 칩 (FR-08)</span>
-                    <span className={styles.reasonChip}>AI 요약</span>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </aside>
-
-        {/* 카카오맵 */}
-        <section className={styles.mapArea}>
-          <KakaoMap
-            center={{ lat: campus.lat, lng: campus.lng }}
-            level={campus.level}
-            restaurants={[]}
-            onMarkerClick={handleMarkerClick}
-          />
-        </section>
-      </div>
+      {viewMode === 'list' && (
+        <div className={styles.listView}>
+          {listContent}
+        </div>
+      )}
     </div>
   );
 }

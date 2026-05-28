@@ -3,7 +3,6 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 // 일반 페이지
 import CampusSelectPage from '@pages/CampusSelectPage/CampusSelectPage';
 import HomePage from '@pages/HomePage/HomePage';
-import ListOnlyPage from '@pages/ListOnlyPage/ListOnlyPage';
 import RestaurantDetailPage from '@pages/RestaurantDetailPage/RestaurantDetailPage';
 import NotFoundPage from '@pages/NotFoundPage/NotFoundPage';
 
@@ -20,7 +19,6 @@ import AdminAnalysesPage from '@pages/admin/AdminAnalysesPage/AdminAnalysesPage'
  *
  * /                          → CampusSelectPage         (FR-01)
  * /campus/:slug              → HomePage (지도+리스트)   (FR-02~07)
- * /campus/:slug/list         → ListOnlyPage             (NFR-R-04)
  * /restaurants/:id           → RestaurantDetailPage     (FR-05)
  * /admin/login               → AdminLoginPage           (FR-12)
  * /admin/*                   → AdminLayout (JWT 가드)   (FR-13~15)
@@ -37,9 +35,6 @@ function App() {
 
       {/* 캠퍼스별 지도+리스트 */}
       <Route path="/campus/:slug" element={<HomePage />} />
-
-      {/* 리스트 전용 (지도 장애 fallback) */}
-      <Route path="/campus/:slug/list" element={<ListOnlyPage />} />
 
       {/* 식당 상세 */}
       <Route path="/restaurants/:id" element={<RestaurantDetailPage />} />

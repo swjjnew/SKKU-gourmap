@@ -1,0 +1,154 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.rowBottom {
+  justify-content: space-between;
+}
+
+/* 카테고리 탭 */
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.tab {
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #555;
+  background: #f3f4f6;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.tab:hover {
+  background: #e5e7eb;
+}
+
+.tabActive {
+  background: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+}
+
+/* 가격대 pill */
+.btnGroup {
+  display: flex;
+  gap: 4px;
+}
+
+.pill {
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #555;
+  background: #f3f4f6;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  font-family: inherit;
+}
+
+.pill:hover {
+  background: #e5e7eb;
+}
+
+.pillActive {
+  background: #0f9b72;
+  color: #fff;
+  border-color: #0f9b72;
+}
+
+/* 주차·웨이팅 토글 */
+.toggleGroup {
+  display: flex;
+  gap: 4px;
+}
+
+.toggle {
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #6b7280;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+  font-family: inherit;
+}
+
+.toggle:hover {
+  border-color: #c8d8ff;
+}
+
+.toggleActive {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-color: #93c5fd;
+  font-weight: 600;
+}
+
+/* 정렬 셀렉트 */
+.sortLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #6b7280;
+  cursor: default;
+}
+
+.select {
+  padding: 4px 8px;
+  font-size: 12px;
+  color: #374151;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.select:focus {
+  outline: 2px solid #93c5fd;
+  outline-offset: 1px;
+}
+
+/* 초기화 버튼 */
+.resetBtn {
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #dc2626;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.12s;
+  font-family: inherit;
+}
+
+.resetBtn:hover {
+  background: #fee2e2;
+}

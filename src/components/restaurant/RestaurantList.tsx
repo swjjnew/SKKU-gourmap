@@ -1,11 +1,11 @@
-import type { Restaurant } from '@/types';
+import type { RestaurantListItem } from '@/types';
 import RestaurantCard from './RestaurantCard';
 import styles from './RestaurantList.module.css';
 
 interface RestaurantListProps {
-  restaurants: Restaurant[];
-  onItemClick?: (restaurant: Restaurant) => void;
-  selectedId?: string | number | null;
+  restaurants: RestaurantListItem[];
+  onItemClick?: (restaurant: RestaurantListItem) => void;
+  selectedId?: number | null;
 }
 
 function RestaurantList({

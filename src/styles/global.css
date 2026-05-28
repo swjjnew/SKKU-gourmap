@@ -43,3 +43,110 @@ img {
   max-width: 100%;
   display: block;
 }
+
+/* ──────────────────────────────────────────
+   카카오맵 커스텀 오버레이 (.ko-overlay*)
+   SDK가 직접 DOM을 삽입하므로 글로벌 스코프 필요
+────────────────────────────────────────── */
+.ko-overlay {
+  position: relative;
+  min-width: 180px;
+  max-width: 240px;
+  padding: 12px 14px 10px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.14);
+  font-size: 13px;
+  line-height: 1.4;
+  color: #222;
+}
+
+/* 말풍선 꼬리 */
+.ko-overlay::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #fff;
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
+}
+
+.ko-overlay-close {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  font-size: 11px;
+  line-height: 20px;
+  text-align: center;
+  color: #aaa;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.ko-overlay-close:hover {
+  color: #555;
+  background: #f0f0f0;
+}
+
+.ko-overlay-name {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 3px;
+  padding-right: 18px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ko-overlay-meta {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.ko-overlay-score {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  background: #e74c3c;
+  border-radius: 4px;
+  vertical-align: middle;
+}
+
+.ko-overlay-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.ko-overlay-tag {
+  display: inline-block;
+  padding: 2px 7px;
+  font-size: 11px;
+  border: 1px solid;
+  border-radius: 999px;
+}
+
+.ko-overlay-summary {
+  margin: 0;
+  font-size: 12px;
+  color: #444;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

@@ -1,5 +1,5 @@
 // NFR-R-04: 지도 장애 시 리스트 전용 fallback 화면
-import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import styles from './ListOnlyPage.module.css';
 
 const CAMPUS_LABELS: Record<string, string> = {

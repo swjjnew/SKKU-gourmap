@@ -1,14 +1,90 @@
-// FR-05: 식당 상세 페이지 (AI 요약, 핵심 리뷰 포인트)
 import { useNavigate, useParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { fetchRestaurantById } from '@services/restaurantService';
+import { TagBadge } from '@components/common/TagBadge';
+import { ReasonChips } from '@components/common/ReasonChips';
+import { RestaurantDetailSkeleton } from '@components/common/Skeleton';
+import type { RestaurantDetail } from '@/types';
 import styles from './RestaurantDetailPage.module.css';
 
-/**
- * RestaurantDetailPage
- * /restaurants/:id — AI 요약, 핵심 리뷰 포인트, 추천 근거 표시
- */
+// ── 개발용 mock (백엔드 없이 UI 확인 시 사용) ──────────────────────
+const MOCK: RestaurantDetail = {
+  id: 1,
+  campusId: 1,
+  name: '성대 앞 한식당',
+  category: '한식',
+  categoryCode: 'korean',
+  address: '경기도 수원시 장안구 천천동 300-1',
+  lat: 37.2967,
+  lng: 127.0099,
+  priceRange: 'normal',
+  priceLabel: '보통',
+  phone: '031-123-4567',
+  openingHours: '11:00 ~ 21:00',
+  closedDays: '일요일',
+  thumbnailUrl: '',
+  imageUrls: [],
+  tags: [
+    { id: 1, name: '혼밥 가능', color: '#3b82f6' },
+    { id: 2, name: '단체석', color: '#10b981' },
+    { id: 3, name: '주차 가능', color: '#f59e0b' },
+  ],
+  parking: true,
+  waiting: false,
+  hasAnalysis: true,
+  summary:
+    '방문자 대부분이 가성비와 맛에 높은 만족도를 보였습니다. 점심시간 혼잡도가 높은 편이나 회전율이 빠릅니다. 주차 공간이 넉넉해 차량 방문에 유리합니다.',
+  recommendationScore: 88,
+  recommendationReasons: ['가성비 좋음', '재료 신선', '웨이팅 적음', '주차 편리'],
+  reviewPoints: [
+    { label: '맛', score: 4.5, description: '대부분의 리뷰어가 맛에 만족' },
+    { label: '가격', score: 4.0, description: '적절한 가격대라는 의견 다수' },
+    { label: '서비스', score: 3.8, description: '보통 수준의 서비스' },
+    { label: '분위기', score: 4.2, description: '조용하고 쾌적한 환경' },
+  ],
+  analysisMetadata: {
+    analyzedAt: '2025-05-01T09:00:00Z',
+    reviewCount: 142,
+    reliabilityRate: 0.87,
+  },
+};
+
+// ── 점수 색상 ──────────────────────────────────────────────────────
+function scoreColor(score: number) {
+  if (score >= 80) return '#16a34a';
+  if (score >= 60) return '#d97706';
+  return '#dc2626';
+}
+
+// ── 메인 컴포넌트 ──────────────────────────────────────────────────
 function RestaurantDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+
+  const { data, isLoading, isError, refetch } = useQuery({
+    queryKey: ['restaurant', id],
+    queryFn: () => fetchRestaurantById(id!),
+    enabled: id != null,
+    staleTime: 60_000,
+    // 백엔드 없을 때 UI 확인용 — 실서버 연결 후 제거
+    placeholderData: MOCK,
+  });
+
+  const r = data ?? MOCK;
+
+  // 실제 데이터 없이 로딩 중일 때 skeleton 표시
+  if (isLoading && !data) {
+    return (
+      <div className={styles.page}>
+        <header className={styles.header}>
+          <button className={styles.backBtn} onClick={() => navigate(-1)}>← 뒤로가기</button>
+        </header>
+        <main className={styles.main}>
+          <RestaurantDetailSkeleton />
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.page}>
@@ -16,91 +92,150 @@ function RestaurantDetailPage() {
         <button className={styles.backBtn} onClick={() => navigate(-1)}>
           ← 뒤로가기
         </button>
-        <span className={styles.badge}>FR-05</span>
+        {isLoading && <span className={styles.loadingBadge}>불러오는 중…</span>}
       </header>
 
+      {isError && (
+        <div className={styles.errorBanner}>
+          데이터를 불러오지 못했습니다.{' '}
+          <button className={styles.retryInline} onClick={() => void refetch()}>
+            재시도
+          </button>
+        </div>
+      )}
+
       <main className={styles.main}>
-        {/* 식당 기본 정보 */}
-        <div className={styles.heroSection}>
+        {/* ── 히어로 섹션 ── */}
+        <section className={styles.heroSection}>
           <div className={styles.heroImage}>
-            🍽️<br />
-            <span>식당 썸네일 이미지 영역</span>
+            {r.thumbnailUrl
+              ? <img src={r.thumbnailUrl} alt={r.name} className={styles.heroImg} />
+              : <span className={styles.heroPlaceholder}>🍽️</span>
+            }
           </div>
           <div className={styles.heroInfo}>
-            <h1 className={styles.restaurantName}>식당 이름 (id: {id})</h1>
+            <h1 className={styles.restaurantName}>{r.name}</h1>
+
             <div className={styles.metaRow}>
-              <span className={styles.category}>한식</span>
-              <span className={styles.price}>💰 보통</span>
-              <span className={styles.score}>★ 4.2</span>
+              <span className={styles.category}>{r.category}</span>
+              <span className={styles.price}>💰 {r.priceLabel}</span>
+              {r.recommendationScore != null && (
+                <span
+                  className={styles.score}
+                  style={{ color: scoreColor(r.recommendationScore) }}
+                >
+                  ★ {r.recommendationScore}점
+                </span>
+              )}
             </div>
-            <p className={styles.address}>📍 주소 영역 (경기도 수원시 ...)</p>
-            <p className={styles.hours}>🕐 영업시간: 11:00 ~ 21:00</p>
-            <p className={styles.phone}>📞 전화번호</p>
+
+            <p className={styles.infoRow}>📍 {r.address}</p>
+            {r.openingHours && (
+              <p className={styles.infoRow}>🕐 {r.openingHours}
+                {r.closedDays && <span className={styles.closed}> · 휴무 {r.closedDays}</span>}
+              </p>
+            )}
+            {r.phone && <p className={styles.infoRow}>📞 {r.phone}</p>}
+
+            <div className={styles.badgeRow}>
+              {r.parking && <span className={styles.infoBadge}>🚗 주차 가능</span>}
+              {r.waiting && <span className={styles.infoBadgeWait}>⏳ 웨이팅 있음</span>}
+            </div>
+
+            {r.tags.length > 0 && (
+              <div className={styles.tagRow}>
+                {r.tags.map(t => <TagBadge key={t.id} tag={t} size="sm" />)}
+              </div>
+            )}
           </div>
-        </div>
+        </section>
 
-        {/* FR-08: 추천 근거 칩 */}
-        <div className={styles.card}>
-          <div className={styles.cardBadge}>FR-08</div>
-          <h2 className={styles.cardTitle}>추천 근거</h2>
-          <div className={styles.reasonChips}>
-            {['가성비 좋음', '재료 신선', '웨이팅 적음', '주차 편리', '분위기 좋음'].map(r => (
-              <span key={r} className={styles.reasonChip}>{r}</span>
-            ))}
-          </div>
-        </div>
+        {/* ── 이미지 갤러리 ── */}
+        {r.imageUrls && r.imageUrls.length > 0 && (
+          <section className={styles.card}>
+            <h2 className={styles.cardTitle}>사진</h2>
+            <div className={styles.gallery}>
+              {r.imageUrls.map((url, i) => (
+                <img
+                  key={i}
+                  src={url}
+                  alt={`${r.name} 사진 ${i + 1}`}
+                  className={styles.galleryImg}
+                />
+              ))}
+            </div>
+          </section>
+        )}
 
-        {/* FR-05: AI 요약 */}
-        <div className={styles.card}>
-          <div className={styles.cardBadge}>FR-05 · AI 요약</div>
-          <h2 className={styles.cardTitle}>AI 리뷰 요약</h2>
-          <p className={styles.aiSummary}>
-            [AI 요약 텍스트 영역] 이 식당의 리뷰를 LLM이 분석한 종합 요약 문장이 표시됩니다.
-            신뢰도 분석 결과를 바탕으로 핵심 특징을 서술합니다.
-          </p>
-          <div className={styles.noAnalysis}>
-            <span className={styles.noAnalysisBadge}>NFR-R-03</span>
-            분석 데이터 없을 때: "분석 정보가 아직 없습니다" 플레이스홀더
-          </div>
-        </div>
+        {/* ── 추천 근거 ── */}
+        {r.recommendationReasons && r.recommendationReasons.length > 0 && (
+          <section className={styles.card}>
+            <h2 className={styles.cardTitle}>추천 근거</h2>
+            <ReasonChips reasons={r.recommendationReasons} max={6} />
+          </section>
+        )}
 
-        {/* FR-05: 핵심 리뷰 포인트 */}
-        <div className={styles.card}>
-          <div className={styles.cardBadge}>FR-05 · 핵심 리뷰 포인트</div>
-          <h2 className={styles.cardTitle}>핵심 리뷰 포인트</h2>
-          <ul className={styles.reviewPoints}>
-            {[
-              { label: '맛', value: '4.5', desc: '대부분의 리뷰어가 맛에 만족' },
-              { label: '가격', value: '4.0', desc: '적절한 가격대라는 의견 다수' },
-              { label: '서비스', value: '3.8', desc: '보통 수준의 서비스' },
-              { label: '분위기', value: '4.2', desc: '조용하고 쾌적한 환경' },
-            ].map(p => (
-              <li key={p.label} className={styles.reviewPoint}>
-                <span className={styles.pointLabel}>{p.label}</span>
-                <span className={styles.pointScore}>★ {p.value}</span>
-                <span className={styles.pointDesc}>{p.desc}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+        {/* ── AI 요약 / 핵심 리뷰 포인트 (hasAnalysis 분기) ── */}
+        {r.hasAnalysis ? (
+          <>
+            {r.summary && (
+              <section className={styles.card}>
+                <h2 className={styles.cardTitle}>AI 리뷰 요약</h2>
+                <p className={styles.aiSummary}>{r.summary}</p>
+                {r.analysisMetadata && (
+                  <p className={styles.analysisMeta}>
+                    리뷰 {r.analysisMetadata.reviewCount}건 분석 ·{' '}
+                    신뢰도 {Math.round(r.analysisMetadata.reliabilityRate * 100)}% ·{' '}
+                    {new Date(r.analysisMetadata.analyzedAt).toLocaleDateString('ko-KR')} 기준
+                  </p>
+                )}
+              </section>
+            )}
 
-        {/* FR-07: 추천 점수 */}
-        <div className={styles.card}>
-          <div className={styles.cardBadge}>FR-07</div>
-          <h2 className={styles.cardTitle}>추천 점수</h2>
-          <div className={styles.scoreDisplay}>
-            <span className={styles.bigScore}>88</span>
-            <span className={styles.scoreDesc}>/ 100 · 백엔드에서 계산된 점수, 프론트는 표시만</span>
-          </div>
-        </div>
+            {r.reviewPoints && r.reviewPoints.length > 0 && (
+              <section className={styles.card}>
+                <h2 className={styles.cardTitle}>핵심 리뷰 포인트</h2>
+                <ul className={styles.reviewPoints}>
+                  {r.reviewPoints.map(p => (
+                    <li key={p.label} className={styles.reviewPoint}>
+                      <span className={styles.pointLabel}>{p.label}</span>
+                      <div className={styles.pointBar}>
+                        <div
+                          className={styles.pointBarFill}
+                          style={{ width: `${(p.score / 5) * 100}%` }}
+                        />
+                      </div>
+                      <span className={styles.pointScore}>★ {p.score.toFixed(1)}</span>
+                      <span className={styles.pointDesc}>{p.description}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
 
-        {/* FR-16: 에러/빈 상태 예시 */}
-        <div className={`${styles.card} ${styles.errorCard}`}>
-          <div className={styles.cardBadge}>FR-16</div>
-          <h2 className={styles.cardTitle}>오류 상태 예시</h2>
-          <p className={styles.errorDesc}>API 4xx/5xx → 표준 에러 메시지 + 재시도 버튼</p>
-          <button className={styles.retryBtn}>재시도</button>
-        </div>
+            {r.recommendationScore != null && (
+              <section className={styles.card}>
+                <h2 className={styles.cardTitle}>추천 점수</h2>
+                <div className={styles.scoreDisplay}>
+                  <span
+                    className={styles.bigScore}
+                    style={{ color: scoreColor(r.recommendationScore) }}
+                  >
+                    {r.recommendationScore}
+                  </span>
+                  <span className={styles.scoreDesc}>/ 100</span>
+                </div>
+              </section>
+            )}
+          </>
+        ) : (
+          <section className={styles.card}>
+            <h2 className={styles.cardTitle}>AI 분석</h2>
+            <div className={styles.noAnalysis}>
+              🔍 아직 분석 데이터가 없습니다. 관리자 페이지에서 분석을 요청할 수 있습니다.
+            </div>
+          </section>
+        )}
       </main>
     </div>
   );
