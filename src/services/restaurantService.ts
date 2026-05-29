@@ -234,10 +234,9 @@ export async function fetchRecommendations(
   if (filter.priceRange) {
     params['price_level'] = priceRangeToBackend(filter.priceRange);
   }
-  if (filter.parking) {
-    params['parking'] = true;
-  }
-  // waiting / sort / page / size: 백엔드 미지원 (추후 추가 예정)
+  if (filter.parking) params['parking'] = true;
+  if (filter.waiting) params['waiting'] = true;
+  // sort / page / size: 백엔드 미지원 (추후 추가 예정)
 
   const { data } = await apiClient.get<BackendCampusRestaurantsResponse>(
     API_ENDPOINTS.recommendationsByCampus(slug),

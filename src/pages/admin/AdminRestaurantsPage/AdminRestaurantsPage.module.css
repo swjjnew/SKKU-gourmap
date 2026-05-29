@@ -162,3 +162,43 @@
 }
 
 .formPlaceholder p { margin: 0; }
+
+.loadingMsg { color: #9ca3af; font-size: 14px; padding: 20px 0; }
+.errorMsg   { color: #dc2626; font-size: 13px; padding: 12px 0; }
+.empty      { text-align: center; color: #9ca3af; padding: 32px 0; font-size: 14px; }
+
+/* 오버레이 / 모달 */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100;
+}
+.modal {
+  background: #fff; border-radius: 16px;
+  padding: 28px 32px; width: 100%; max-width: 640px;
+  max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+}
+.modalTitle { font-size: 18px; font-weight: 700; color: #111827; margin: 0 0 20px; }
+.modalForm  { display: flex; flex-direction: column; gap: 16px; }
+.modalGrid  { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.modalBtns  { display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px; }
+
+.field      { display: flex; flex-direction: column; gap: 4px; }
+.label      { font-size: 12px; font-weight: 600; color: #374151; }
+.input      { border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px 12px; font-size: 13px; font-family: inherit; outline: none; }
+.input:focus { border-color: #6366f1; box-shadow: 0 0 0 2px rgba(99,102,241,0.15); }
+.fieldError { font-size: 11px; color: #dc2626; }
+
+.saveBtn   { background: #4f46e5; color: #fff; border: none; border-radius: 8px; padding: 9px 20px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.saveBtn:disabled { background: #a5b4fc; cursor: not-allowed; }
+.cancelBtn { background: #f3f4f6; color: #374151; border: none; border-radius: 8px; padding: 9px 20px; font-size: 13px; cursor: pointer; }
+
+/* 삭제 확인 */
+.confirmBox { background: #fff; border-radius: 14px; padding: 28px 32px; max-width: 400px; width: 100%; text-align: center; }
+.confirmMsg { font-size: 15px; color: #111827; margin: 0 0 20px; line-height: 1.6; }
+.confirmSub { font-size: 12px; color: #9ca3af; }
+.confirmBtns { display: flex; justify-content: center; gap: 12px; }
+.confirmDeleteBtn { background: #ef4444; color: #fff; border: none; border-radius: 8px; padding: 9px 20px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.confirmDeleteBtn:disabled { background: #fca5a5; cursor: not-allowed; }

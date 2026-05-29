@@ -188,3 +188,33 @@
 }
 
 .resultPlaceholder p { margin: 0; }
+
+.desc         { font-size: 13px; color: #6b7280; margin: 4px 0 0; }
+.triggerRow   { display: flex; gap: 10px; align-items: center; }
+.select       { flex: 1; border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px 12px; font-size: 13px; font-family: inherit; outline: none; }
+.startBtn     { background: #4f46e5; color: #fff; border: none; border-radius: 8px; padding: 9px 20px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; white-space: nowrap; }
+.startBtn:disabled { background: #a5b4fc; cursor: not-allowed; }
+
+.cardHeader   { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.pollingBadge { font-size: 11px; color: #6366f1; background: #eef2ff; padding: 3px 10px; border-radius: 20px; }
+
+.jobList  { display: flex; flex-direction: column; gap: 12px; }
+.jobItem  { padding: 12px 14px; background: #f9fafb; border-radius: 10px; border: 1px solid #e5e7eb; }
+.jobTop   { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+.jobRestaurant { font-size: 14px; font-weight: 600; color: #111827; flex: 1; }
+.jobDate       { font-size: 12px; color: #9ca3af; }
+
+.statusBadge     { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+.status_pending   { background: #fef3c7; color: #92400e; }
+.status_running   { background: #dbeafe; color: #1e40af; }
+.status_completed { background: #dcfce7; color: #166534; }
+.status_failed    { background: #fee2e2; color: #991b1b; }
+
+.progressBar  { height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden; }
+.progressFill { height: 100%; background: #6366f1; border-radius: 3px; transition: width 0.4s ease; }
+.progressLabel { font-size: 11px; color: #6b7280; margin-top: 4px; }
+.completedAt   { font-size: 12px; color: #6b7280; margin: 4px 0 0; }
+
+.errorMsg   { font-size: 13px; color: #dc2626; margin-top: 10px; }
+.successMsg { font-size: 13px; color: #16a34a; margin-top: 10px; }
+.empty      { font-size: 14px; color: #9ca3af; text-align: center; padding: 24px 0; }

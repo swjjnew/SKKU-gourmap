@@ -1,75 +1,129 @@
-// FR-15: 관리자 분석 관리 화면
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { fetchAnalysisJobs, startAnalysisJob } from '@services/adminService';
+import { fetchRestaurantsByCampus } from '@services/restaurantService';
+import type { AnalysisJobStatus } from '@/types';
 import styles from './AdminAnalysesPage.module.css';
 
-/**
- * AdminAnalysesPage
- * /admin/analyses — CSV 업로드, 분석 잡 실행·폴링, 결과 확인
- */
+// 진행 중인 잡이 있을 때 폴링 간격 (ms)
+const POLL_INTERVAL = 5_000;
+
+const STATUS_LABEL: Record<AnalysisJobStatus, string> = {
+  pending:   '대기',
+  running:   '진행 중',
+  completed: '완료',
+  failed:    '실패',
+};
+
 function AdminAnalysesPage() {
+  const qc = useQueryClient();
+  const [selectedRestaurantId, setSelectedRestaurantId] = useState<number | ''>('');
+
+  // 식당 목록 (분석 대상 선택용)
+  const naturalQ    = useQuery({ queryKey: ['admin', 'restaurants', 'natural'],    queryFn: () => fetchRestaurantsByCampus('natural'),    staleTime: 60_000 });
+  const humanitiesQ = useQuery({ queryKey: ['admin', 'restaurants', 'humanities'], queryFn: () => fetchRestaurantsByCampus('humanities'), staleTime: 60_000 });
+  const allRestaurants = [...(naturalQ.data ?? []), ...(humanitiesQ.data ?? [])];
+
+  // 분석 잡 목록 — running 잡 있으면 폴링
+  const { data: jobs = [], isError } = useQuery({
+    queryKey: ['admin', 'analysis-jobs'],
+    queryFn: fetchAnalysisJobs,
+    refetchInterval: (query) => {
+      const list = query.state.data ?? [];
+      return list.some(j => j.status === 'running' || j.status === 'pending')
+        ? POLL_INTERVAL
+        : false;
+    },
+    staleTime: 10_000,
+  });
+
+  const startMut = useMutation({
+    mutationFn: (restaurantId: number) => startAnalysisJob(restaurantId),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['admin', 'analysis-jobs'] });
+      setSelectedRestaurantId('');
+    },
+  });
+
   return (
     <div className={styles.page}>
       <div className={styles.pageHeader}>
         <h1 className={styles.title}>분석 관리</h1>
-        <span className={styles.badge}>FR-15</span>
+        <p className={styles.desc}>식당 리뷰 AI 분석 잡을 실행하고 결과를 확인합니다.</p>
       </div>
 
-      {/* CSV 업로드 */}
+      {/* 새 분석 요청 */}
       <div className={styles.card}>
-        <div className={styles.cardBadge}>CSV 업로드 (FR-15)</div>
-        <h2 className={styles.cardTitle}>리뷰 데이터 업로드</h2>
-        <div className={styles.uploadZone}>
-          <div className={styles.uploadIcon}>📁</div>
-          <p>CSV 파일을 드래그하거나 클릭해서 업로드</p>
-          <p className={styles.uploadHint}>리뷰 데이터 CSV (id, restaurant_id, content, ...)</p>
-          <button className={styles.uploadBtn}>파일 선택</button>
+        <h2 className={styles.cardTitle}>새 분석 요청</h2>
+        <div className={styles.triggerRow}>
+          <select
+            className={styles.select}
+            value={selectedRestaurantId}
+            onChange={e => setSelectedRestaurantId(e.target.value === '' ? '' : Number(e.target.value))}
+          >
+            <option value="">식당 선택…</option>
+            {allRestaurants.map(r => (
+              <option key={r.id} value={r.id}>
+                {r.name} ({r.category})
+              </option>
+            ))}
+          </select>
+          <button
+            className={styles.startBtn}
+            disabled={!selectedRestaurantId || startMut.isPending}
+            onClick={() => selectedRestaurantId !== '' && startMut.mutate(Number(selectedRestaurantId))}
+          >
+            {startMut.isPending ? '요청 중…' : '분석 시작'}
+          </button>
         </div>
+        {startMut.isError && <p className={styles.errorMsg}>분석 요청에 실패했습니다.</p>}
+        {startMut.isSuccess && <p className={styles.successMsg}>분석 잡이 등록되었습니다.</p>}
       </div>
 
-      {/* 분석 잡 현황 */}
+      {/* 잡 목록 */}
       <div className={styles.card}>
-        <div className={styles.cardBadge}>분석 잡 폴링 (FR-15)</div>
-        <h2 className={styles.cardTitle}>분석 잡 현황</h2>
+        <div className={styles.cardHeader}>
+          <h2 className={styles.cardTitle}>분석 잡 현황</h2>
+          {jobs.some(j => j.status === 'running' || j.status === 'pending') && (
+            <span className={styles.pollingBadge}>🔄 자동 갱신 중</span>
+          )}
+        </div>
+
+        {isError && <p className={styles.errorMsg}>잡 목록을 불러오지 못했습니다. (백엔드 admin API 확인 필요)</p>}
+
+        {jobs.length === 0 && !isError && (
+          <p className={styles.empty}>등록된 분석 잡이 없습니다.</p>
+        )}
+
         <div className={styles.jobList}>
-          {[
-            { id: 'JOB-001', restaurant: '맛집 A', status: '완료', progress: 100, created: '2026-05-17' },
-            { id: 'JOB-002', restaurant: '맛집 D', status: '진행 중', progress: 64, created: '2026-05-18' },
-            { id: 'JOB-003', restaurant: '맛집 E', status: '대기', progress: 0, created: '2026-05-18' },
-          ].map(job => (
-            <div key={job.id} className={styles.jobItem}>
+          {jobs.map(job => (
+            <div key={job.jobId} className={styles.jobItem}>
               <div className={styles.jobTop}>
-                <span className={styles.jobId}>{job.id}</span>
-                <span className={styles.jobRestaurant}>{job.restaurant}</span>
-                <span className={
-                  job.status === '완료' ? styles.statusDone
-                  : job.status === '진행 중' ? styles.statusRunning
-                  : styles.statusPending
-                }>
-                  {job.status}
+                <span className={styles.jobRestaurant}>{job.restaurantName}</span>
+                <span className={`${styles.statusBadge} ${styles[`status_${job.status}`]}`}>
+                  {STATUS_LABEL[job.status]}
                 </span>
-                <span className={styles.jobDate}>{job.created}</span>
+                <span className={styles.jobDate}>
+                  {new Date(job.createdAt).toLocaleDateString('ko-KR')}
+                </span>
               </div>
-              <div className={styles.progressBar}>
-                <div
-                  className={styles.progressFill}
-                  style={{ width: `${job.progress}%` }}
-                />
-              </div>
-              <div className={styles.progressLabel}>{job.progress}%</div>
+
+              {(job.status === 'running' || job.status === 'pending') && (
+                <>
+                  <div className={styles.progressBar}>
+                    <div className={styles.progressFill} style={{ width: `${job.progress}%` }} />
+                  </div>
+                  <span className={styles.progressLabel}>{job.progress}%</span>
+                </>
+              )}
+
+              {job.status === 'completed' && job.completedAt && (
+                <p className={styles.completedAt}>
+                  완료: {new Date(job.completedAt).toLocaleString('ko-KR')}
+                </p>
+              )}
             </div>
           ))}
-        </div>
-        <p className={styles.pollingNote}>
-          진행 중인 잡은 일정 간격으로 백엔드 API 폴링 (TanStack Query refetchInterval)
-        </p>
-      </div>
-
-      {/* 분석 결과 요약 */}
-      <div className={styles.card}>
-        <div className={styles.cardBadge}>분석 결과 (FR-15)</div>
-        <h2 className={styles.cardTitle}>최근 완료된 분석 결과</h2>
-        <div className={styles.resultPlaceholder}>
-          <p>완료된 분석 잡의 결과 요약 표시 영역</p>
-          <p>AI 요약, 핵심 포인트, 신뢰도 점수 분포 등을 확인하고 DB에 반영합니다.</p>
         </div>
       </div>
     </div>

@@ -13,21 +13,17 @@ export interface FilterParams {
 }
 
 const DEFAULT_FILTER: FilterParams = {
-  category: '',
+  category:   '',
   priceRange: '',
-  parking: false,
-  waiting: false,
-  sort: 'score',
+  parking:    false,
+  waiting:    false,
+  sort:       'score',
 };
 
 function parseBool(value: string | null): boolean {
   return value === 'true';
 }
 
-/**
- * URL 쿼리 파라미터를 필터 상태로 읽고 쓰는 훅.
- * campusId 의존 제거 — slug는 URL 경로에서 직접 사용.
- */
 export function useFilterParams() {
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -78,7 +74,6 @@ export function useFilterParams() {
     filter.parking    !== DEFAULT_FILTER.parking     ||
     filter.waiting    !== DEFAULT_FILTER.waiting;
 
-  /** restaurantService.fetchRecommendations 에 넘길 형태로 변환 */
   const toRestaurantFilter = (): RestaurantFilter => ({
     category:   filter.category   || undefined,
     priceRange: filter.priceRange || undefined,

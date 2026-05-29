@@ -1,5 +1,6 @@
 import axios, { AxiosError, type AxiosInstance } from 'axios';
 import { API_BASE_URL, API_TIMEOUT_MS } from '@config/apiConfig';
+import { useAuthStore } from '@stores/authStore';
 import type { ApiError } from '@/types';
 
 /**
@@ -13,6 +14,15 @@ export const apiClient: AxiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+});
+
+// JWT 토큰을 모든 요청 헤더에 자동 첨부 (NFR-S-01: 메모리 저장)
+apiClient.interceptors.request.use((config) => {
+  const token = useAuthStore.getState().token;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 apiClient.interceptors.response.use(

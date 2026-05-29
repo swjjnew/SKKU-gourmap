@@ -1,75 +1,140 @@
-// FR-14: 관리자 리뷰 관리 화면
+import { useRef, useState } from 'react';
+import { uploadReviewCSV, type UploadResult } from '@services/adminService';
 import styles from './AdminReviewsPage.module.css';
 
-/**
- * AdminReviewsPage
- * /admin/reviews — 리뷰 검토 및 삭제
- */
 function AdminReviewsPage() {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [file, setFile]           = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [result, setResult]       = useState<UploadResult | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0] ?? null;
+    setFile(f);
+    setResult(null);
+    setUploadError(null);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const f = e.dataTransfer.files[0];
+    if (f && f.name.endsWith('.csv')) {
+      setFile(f);
+      setResult(null);
+      setUploadError(null);
+    }
+  };
+
+  const handleUpload = async () => {
+    if (!file) return;
+    setUploading(true);
+    setUploadError(null);
+    try {
+      const res = await uploadReviewCSV(file);
+      setResult(res);
+    } catch {
+      setUploadError('업로드에 실패했습니다. 파일 형식과 백엔드 서버를 확인해주세요.');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <div className={styles.page}>
       <div className={styles.pageHeader}>
         <h1 className={styles.title}>리뷰 관리</h1>
-        <span className={styles.badge}>FR-14</span>
+        <p className={styles.desc}>리뷰 CSV 파일을 업로드하여 DB에 반영합니다.</p>
       </div>
 
-      <div className={styles.toolbar}>
-        <input className={styles.search} type="text" placeholder="리뷰 내용 검색..." />
-        <select className={styles.select}>
-          <option>전체 식당</option>
-        </select>
-        <select className={styles.select}>
-          <option>전체 상태</option>
-          <option>정상</option>
-          <option>신고됨</option>
-        </select>
+      {/* CSV 업로드 카드 */}
+      <div className={styles.card}>
+        <h2 className={styles.cardTitle}>리뷰 데이터 CSV 업로드</h2>
+        <p className={styles.hint}>
+          형식: <code>restaurant_external_id, content, source_url, ...</code>
+        </p>
+
+        <div
+          className={`${styles.dropZone} ${file ? styles.dropZoneActive : ''}`}
+          onDrop={handleDrop}
+          onDragOver={e => e.preventDefault()}
+          onClick={() => inputRef.current?.click()}
+        >
+          <input
+            ref={inputRef}
+            type="file"
+            accept=".csv"
+            className={styles.fileInput}
+            onChange={handleFileChange}
+          />
+          {file ? (
+            <div className={styles.fileSelected}>
+              <span className={styles.fileIcon}>📄</span>
+              <span className={styles.fileName}>{file.name}</span>
+              <span className={styles.fileSize}>({(file.size / 1024).toFixed(1)} KB)</span>
+            </div>
+          ) : (
+            <div className={styles.dropPrompt}>
+              <span className={styles.uploadIcon}>📁</span>
+              <p>CSV 파일을 드래그하거나 클릭해서 선택</p>
+              <p className={styles.uploadSub}>restaurant_external_id, content, source_url 컬럼 필수</p>
+            </div>
+          )}
+        </div>
+
+        <div className={styles.uploadActions}>
+          {file && (
+            <button
+              className={styles.clearBtn}
+              onClick={() => { setFile(null); setResult(null); setUploadError(null); }}
+            >
+              파일 초기화
+            </button>
+          )}
+          <button
+            className={styles.uploadBtn}
+            onClick={handleUpload}
+            disabled={!file || uploading}
+          >
+            {uploading ? '업로드 중…' : '업로드'}
+          </button>
+        </div>
+
+        {/* 업로드 결과 */}
+        {result && (
+          <div className={styles.result}>
+            <p className={styles.resultTitle}>업로드 완료</p>
+            <div className={styles.resultGrid}>
+              <div className={styles.resultItem}>
+                <span className={styles.resultNum}>{result.insertedCount}</span>
+                <span className={styles.resultLabel}>등록 성공</span>
+              </div>
+              <div className={styles.resultItem}>
+                <span className={styles.resultNum}>{result.skippedCount}</span>
+                <span className={styles.resultLabel}>중복 건너뜀</span>
+              </div>
+              <div className={`${styles.resultItem} ${result.errorCount > 0 ? styles.resultError : ''}`}>
+                <span className={styles.resultNum}>{result.errorCount}</span>
+                <span className={styles.resultLabel}>오류</span>
+              </div>
+            </div>
+            {result.errors && result.errors.length > 0 && (
+              <ul className={styles.errorList}>
+                {result.errors.map((e, i) => <li key={i}>{e}</li>)}
+              </ul>
+            )}
+          </div>
+        )}
+
+        {uploadError && <p className={styles.errorMsg}>{uploadError}</p>}
       </div>
 
-      <div className={styles.tableWrap}>
-        <div className={styles.tableBadge}>리뷰 목록 테이블 (검토·삭제)</div>
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>식당</th>
-              <th>내용 (요약)</th>
-              <th>신뢰도 점수</th>
-              <th>상태</th>
-              <th>액션</th>
-            </tr>
-          </thead>
-          <tbody>
-            {[
-              { id: 101, rest: '맛집 A', content: '음식이 정말 맛있고 서비스도 좋아요...', score: 0.92, status: '정상' },
-              { id: 102, rest: '맛집 B', content: '가격 대비 양이 적어요. 다시는 안 갈 것...', score: 0.45, status: '신고됨' },
-              { id: 103, rest: '맛집 C', content: '분위기 좋고 직원분들이 친절해요...', score: 0.88, status: '정상' },
-            ].map(r => (
-              <tr key={r.id}>
-                <td>{r.id}</td>
-                <td>{r.rest}</td>
-                <td className={styles.contentCell}>{r.content}</td>
-                <td>
-                  <span className={r.score >= 0.7 ? styles.highScore : styles.lowScore}>
-                    {r.score.toFixed(2)}
-                  </span>
-                </td>
-                <td>
-                  <span className={r.status === '신고됨' ? styles.flaggedTag : styles.normalTag}>
-                    {r.status}
-                  </span>
-                </td>
-                <td>
-                  <button className={styles.deleteBtn}>삭제</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <div className={styles.infoBox}>
-        <span className={styles.infoBadge}>LLM 신뢰도 분석</span>
-        <p>신뢰도 점수는 백엔드(SKT A.X)에서 계산된 값. 프론트는 표시 및 필터링만 담당합니다.</p>
+      {/* 안내 */}
+      <div className={styles.card}>
+        <h2 className={styles.cardTitle}>CSV 형식 안내</h2>
+        <pre className={styles.csvSample}>{`restaurant_external_id,content,source_url
+kakao_001,"음식이 맛있어요. 분위기도 좋음.",https://...
+kakao_002,"가성비 최고!",https://...`}</pre>
       </div>
     </div>
   );
