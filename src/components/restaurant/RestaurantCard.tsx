@@ -43,12 +43,9 @@ function RestaurantCard({ restaurant, selected, onClick }: RestaurantCardProps) 
       )}
 
       <div className={styles.body}>
-        {/* 이름 + 점수 배지 */}
+        {/* 이름 */}
         <div className={styles.titleRow}>
           <span className={styles.name}>{name}</span>
-          {hasAnalysis && recommendationScore != null && (
-            <span className={styles.score}>{recommendationScore}점</span>
-          )}
         </div>
 
         {/* 카테고리 · 가격 */}

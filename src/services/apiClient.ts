@@ -9,7 +9,7 @@ import type { ApiError } from '@/types';
  * - 응답 인터셉터에서 에러 형식 정규화
  */
 export const apiClient: AxiosInstance = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: `${API_BASE_URL}/api`,
   timeout: API_TIMEOUT_MS,
   headers: {
     'Content-Type': 'application/json',

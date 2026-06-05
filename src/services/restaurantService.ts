@@ -56,11 +56,11 @@ interface BackendCampusRestaurantsResponse {
 
 interface BackendCampus {
   id: number;
+  slug: string;
   name: string;
   latitude: number;
   longitude: number;
   radius_m: number;
-  // slug: 백엔드 CampusResponse 스키마에 누락 — 백엔드팀 추가 요청 필요
 }
 
 // ────────────────────────────────────────────────────────────────
@@ -161,13 +161,17 @@ function toDetail(r: BackendRestaurant): RestaurantDetail {
   const base = toListItem(r);
   return {
     ...base,
-    phone:       r.phone ?? undefined,
-    openingHours: undefined,   // 백엔드 미지원
-    closedDays:   undefined,   // 백엔드 미지원
-    imageUrls:    [],
-    reviewPoints: undefined,   // 백엔드 미지원 (별도 분석 결과)
-    // averageTrustScore가 있을 때만 metadata 구성 (허수 값 제거)
-    analysisMetadata: r.averageTrustScore != null
+    phone:              r.phone ?? undefined,
+    openingHours:       undefined,   // 백엔드 미지원
+    closedDays:         undefined,   // 백엔드 미지원
+    imageUrls:          [],
+    representativeMenu: r.representativeMenu ?? undefined,
+    moodSummary:        r.moodSummary        ?? undefined,
+    parkingSummary:     r.parkingSummary      ?? undefined,
+    waitingSummary:     r.waitingSummary      ?? undefined,
+    averageTrustScore:  r.averageTrustScore   ?? undefined,
+    reviewPoints:       undefined,   // 백엔드 미지원 (별도 분석 결과)
+    analysisMetadata:   r.averageTrustScore != null
       ? {
           analyzedAt:      '',
           reviewCount:     0,
@@ -177,11 +181,25 @@ function toDetail(r: BackendRestaurant): RestaurantDetail {
   };
 }
 
-/** 추천 점수 기준 내림차순 정렬 (백엔드 sort 버그 우회) */
-function sortByScore(list: RestaurantListItem[]): RestaurantListItem[] {
-  return [...list].sort(
-    (a, b) => (b.recommendationScore ?? 0) - (a.recommendationScore ?? 0),
-  );
+const PRICE_ORDER: Record<string, number> = { cheap: 0, normal: 1, expensive: 2 };
+
+/** sort 옵션에 따라 식당 목록 정렬.
+ *  - score: recommendationScore 내림차순 (백엔드 sort 버그 우회 포함)
+ *  - name:  이름 가나다순
+ *  - price: 가격 낮은 순
+ */
+function applySort(list: RestaurantListItem[], sort?: string): RestaurantListItem[] {
+  const arr = [...list];
+  switch (sort) {
+    case 'name':
+      return arr.sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+    case 'price':
+      return arr.sort(
+        (a, b) => (PRICE_ORDER[a.priceRange] ?? 1) - (PRICE_ORDER[b.priceRange] ?? 1),
+      );
+    default: // 'score'
+      return arr.sort((a, b) => (b.recommendationScore ?? 0) - (a.recommendationScore ?? 0));
+  }
 }
 
 // ────────────────────────────────────────────────────────────────
@@ -192,7 +210,7 @@ export async function fetchCampuses(): Promise<Campus[]> {
   const { data } = await apiClient.get<BackendCampus[]>(API_ENDPOINTS.campuses);
   return data.map(c => ({
     id:   c.id,
-    slug: '',   // 백엔드 CampusResponse에 slug 필드 추가 필요
+    slug: c.slug,
     name: c.name,
     lat:  c.latitude,
     lng:  c.longitude,
@@ -206,11 +224,12 @@ export async function fetchCampuses(): Promise<Campus[]> {
 
 export async function fetchRestaurantsByCampus(
   slug: string,
+  sort?: string,
 ): Promise<RestaurantListItem[]> {
   const { data } = await apiClient.get<BackendCampusRestaurantsResponse>(
     API_ENDPOINTS.restaurantsByCampus(slug),
   );
-  return data.restaurants.map(toListItem);
+  return applySort(data.restaurants.map(toListItem), sort);
 }
 
 // ────────────────────────────────────────────────────────────────
@@ -234,6 +253,7 @@ export async function fetchRecommendations(
   if (filter.priceRange) {
     params['price_level'] = priceRangeToBackend(filter.priceRange);
   }
+  if (filter.mood)    params['mood']    = filter.mood;
   if (filter.parking) params['parking'] = true;
   if (filter.waiting) params['waiting'] = true;
   // sort / page / size: 백엔드 미지원 (추후 추가 예정)
@@ -243,8 +263,8 @@ export async function fetchRecommendations(
     { params },
   );
 
-  // 백엔드 sort 버그 우회 — 프론트에서 recommendationScore 기준 정렬
-  return sortByScore(data.restaurants.map(toListItem));
+  // 백엔드 sort 버그 우회 + 이름순/가격순 클라이언트 정렬
+  return applySort(data.restaurants.map(toListItem), filter.sort);
 }
 
 // ────────────────────────────────────────────────────────────────

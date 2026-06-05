@@ -37,6 +37,7 @@ export interface AdminRestaurantPayload {
   lng: number;
   phone?: string;
   sourceUrl?: string;
+  externalId?: string;  // 카카오 등 외부 식당 식별자
 }
 
 export async function fetchAdminRestaurants(): Promise<RestaurantListItem[]> {

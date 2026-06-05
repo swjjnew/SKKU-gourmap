@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 // 일반 페이지
 import CampusSelectPage from '@pages/CampusSelectPage/CampusSelectPage';
 import HomePage from '@pages/HomePage/HomePage';
+import ListOnlyPage from '@pages/ListOnlyPage/ListOnlyPage';
 import RestaurantDetailPage from '@pages/RestaurantDetailPage/RestaurantDetailPage';
 import NotFoundPage from '@pages/NotFoundPage/NotFoundPage';
 
@@ -35,6 +36,9 @@ function App() {
 
       {/* 캠퍼스별 지도+리스트 */}
       <Route path="/campus/:slug" element={<HomePage />} />
+
+      {/* 지도 없이 리스트 전용 fallback (NFR-R-04) */}
+      <Route path="/campus/:slug/list" element={<ListOnlyPage />} />
 
       {/* 식당 상세 */}
       <Route path="/restaurants/:id" element={<RestaurantDetailPage />} />

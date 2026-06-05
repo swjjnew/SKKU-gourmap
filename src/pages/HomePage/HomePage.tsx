@@ -30,8 +30,8 @@ function HomePage() {
 
   // ── 식당 목록: 필터 없으면 전체조회, 있으면 추천 API ────────────
   const baseQuery = useQuery({
-    queryKey: ['restaurants', 'byCampus', campusKey],
-    queryFn: () => fetchRestaurantsByCampus(campusKey),
+    queryKey: ['restaurants', 'byCampus', campusKey, filter.sort],
+    queryFn: () => fetchRestaurantsByCampus(campusKey, filter.sort),
     enabled: !hasFilter,
     staleTime: 60_000,
   });
@@ -145,7 +145,21 @@ function HomePage() {
             {listContent}
           </aside>
           <section className={styles.mapArea}>
-            <ErrorBoundary name="map" retryLabel="지도 다시 로드">
+            <ErrorBoundary
+              name="map"
+              retryLabel="지도 다시 로드"
+              fallback={
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 12 }}>
+                  <p style={{ color: '#6b7280', fontSize: 14 }}>🗺️ 지도를 불러올 수 없습니다.</p>
+                  <button
+                    style={{ background: '#2563eb', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 18px', fontSize: 13, cursor: 'pointer' }}
+                    onClick={() => navigate(`/campus/${campusKey}/list`)}
+                  >
+                    목록으로 보기
+                  </button>
+                </div>
+              }
+            >
               <KakaoMap
                 center={{ lat: campus.lat, lng: campus.lng }}
                 level={campus.level}

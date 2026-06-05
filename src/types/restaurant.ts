@@ -106,6 +106,11 @@ export interface RestaurantDetail {
 
   hasAnalysis: boolean;
   summary?: string;
+  representativeMenu?: string;   // 대표 메뉴 (파이프 구분: "파스타|스테이크")
+  moodSummary?: string;          // 분위기 요약
+  parkingSummary?: string;       // 주차 요약
+  waitingSummary?: string;       // 웨이팅 요약
+  averageTrustScore?: number;    // 평균 리뷰 신뢰도 점수 (0~100)
   recommendationScore?: number;
   recommendationReasons?: string[];
   reviewPoints?: ReviewPoint[];

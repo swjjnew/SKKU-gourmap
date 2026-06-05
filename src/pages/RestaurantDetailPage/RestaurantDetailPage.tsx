@@ -175,6 +175,18 @@ function RestaurantDetailPage() {
           </section>
         )}
 
+        {/* ── 대표 메뉴 ── */}
+        {r.representativeMenu && (
+          <section className={styles.card}>
+            <h2 className={styles.cardTitle}>대표 메뉴</h2>
+            <div className={styles.menuChips}>
+              {r.representativeMenu.split('|').map(m => (
+                <span key={m} className={styles.menuChip}>{m.trim()}</span>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* ── AI 요약 / 핵심 리뷰 포인트 (hasAnalysis 분기) ── */}
         {r.hasAnalysis ? (
           <>
@@ -182,13 +194,24 @@ function RestaurantDetailPage() {
               <section className={styles.card}>
                 <h2 className={styles.cardTitle}>AI 리뷰 요약</h2>
                 <p className={styles.aiSummary}>{r.summary}</p>
-                {r.analysisMetadata && (
-                  <p className={styles.analysisMeta}>
-                    리뷰 {r.analysisMetadata.reviewCount}건 분석 ·{' '}
-                    신뢰도 {Math.round(r.analysisMetadata.reliabilityRate * 100)}% ·{' '}
-                    {new Date(r.analysisMetadata.analyzedAt).toLocaleDateString('ko-KR')} 기준
+                {r.averageTrustScore != null && (
+                  <p className={styles.trustScore}>
+                    리뷰 신뢰도 점수 <strong>{r.averageTrustScore.toFixed(1)}</strong> / 100
+                    <span className={styles.trustNote}> (참고 지표)</span>
                   </p>
                 )}
+              </section>
+            )}
+
+            {/* 분위기 / 주차 / 웨이팅 요약 */}
+            {(r.moodSummary || r.parkingSummary || r.waitingSummary) && (
+              <section className={styles.card}>
+                <h2 className={styles.cardTitle}>상세 분위기 정보</h2>
+                <ul className={styles.summaryList}>
+                  {r.moodSummary    && <li><span className={styles.summaryLabel}>분위기</span>{r.moodSummary}</li>}
+                  {r.parkingSummary && <li><span className={styles.summaryLabel}>주차</span>{r.parkingSummary}</li>}
+                  {r.waitingSummary && <li><span className={styles.summaryLabel}>웨이팅</span>{r.waitingSummary}</li>}
+                </ul>
               </section>
             )}
 

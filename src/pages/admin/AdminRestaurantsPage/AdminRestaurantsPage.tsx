@@ -24,6 +24,7 @@ const schema = z.object({
   lng:        z.coerce.number(),
   phone:      z.string().optional(),
   sourceUrl:  z.string().optional(),
+  externalId: z.string().optional(),
 });
 type FormValues = z.infer<typeof schema>;
 
@@ -186,6 +187,7 @@ function RestaurantModal({ target, onClose, onSubmit, isPending, error }: ModalP
       campusSlug: target.campusId === 1 ? 'natural' : 'humanities',
       category:   target.category,
       priceLevel: target.priceLabel as '저렴함' | '보통' | '비쌈',
+        externalId: undefined,
       lat:        target.lat,
       lng:        target.lng,
     } : undefined,
@@ -231,6 +233,9 @@ function RestaurantModal({ target, onClose, onSubmit, isPending, error }: ModalP
             </Field>
             <Field label="출처 URL" error={errors.sourceUrl?.message}>
               <input className={styles.input} {...register('sourceUrl')} />
+            </Field>
+            <Field label="외부 ID (externalId)" error={errors.externalId?.message}>
+              <input className={styles.input} placeholder="kakao_001 등 (선택)" {...register('externalId')} />
             </Field>
           </div>
 

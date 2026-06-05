@@ -20,6 +20,7 @@ const PRICE_RANGES: { value: PriceRange | ''; label: string }[] = [
   { value: 'expensive', label: '비쌈' },
 ];
 
+
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'score', label: '추천 점수순' },
   { value: 'name', label: '이름순' },
@@ -60,7 +61,7 @@ export function FilterPanel({ filter, hasFilter, onChange, onReset }: Props) {
         </div>
       </div>
 
-      {/* 가격대 + 조건 토글 */}
+{/* 가격대 + 조건 토글 */}
       <div className={styles.row}>
         <div className={styles.btnGroup} role="group" aria-label="가격대">
           {PRICE_RANGES.map(({ value, label }) => (
