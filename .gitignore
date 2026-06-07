@@ -35,6 +35,14 @@ Thumbs.db
 .env.local
 .env.*.local
 
+# Backend
+backend/venv/
+backend/restaurant.db
+backend/__pycache__/
+backend/app/__pycache__/
+backend/app/**/__pycache__/
+backend/**/*.pyc
+
 # Test
 coverage
 *.lcov
