@@ -97,7 +97,7 @@ function ListOnlyPage() {
               <RestaurantCard
                 restaurant={r}
                 selected={false}
-                onClick={() => navigate(`/restaurants/${r.id}`)}
+                onClick={() => navigate(`/restaurants/${r.id}`, { state: { from: `/campus/${campusKey}/list` } })}
               />
             </li>
           ))}

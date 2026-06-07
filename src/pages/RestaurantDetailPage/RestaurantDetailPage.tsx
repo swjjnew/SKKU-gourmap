@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { fetchRestaurantById } from '@services/restaurantService';
 import { TagBadge } from '@components/common/TagBadge';
@@ -60,6 +60,9 @@ function scoreColor(score: number) {
 function RestaurantDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const backTo: string = (location.state as { from?: string })?.from ?? -1 as unknown as string;
+  const handleBack = () => backTo === (-1 as unknown as string) ? navigate(-1) : navigate(backTo);
 
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['restaurant', id],
@@ -77,7 +80,7 @@ function RestaurantDetailPage() {
     return (
       <div className={styles.page}>
         <header className={styles.header}>
-          <button className={styles.backBtn} onClick={() => navigate(-1)}>← 뒤로가기</button>
+          <button className={styles.backBtn} onClick={handleBack}>← 뒤로가기</button>
         </header>
         <main className={styles.main}>
           <RestaurantDetailSkeleton />
@@ -89,7 +92,7 @@ function RestaurantDetailPage() {
   return (
     <div className={styles.page}>
       <header className={styles.header}>
-        <button className={styles.backBtn} onClick={() => navigate(-1)}>
+        <button className={styles.backBtn} onClick={handleBack}>
           ← 뒤로가기
         </button>
         {isLoading && <span className={styles.loadingBadge}>불러오는 중…</span>}

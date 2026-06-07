@@ -50,13 +50,13 @@ function HomePage() {
   // ── 이벤트 핸들러 ──────────────────────────────────────────────
   const handleMarkerClick = useCallback((r: RestaurantListItem) => {
     setSelectedId(r.id);
-    navigate(`/restaurants/${r.id}`);
-  }, [navigate]);
+    navigate(`/restaurants/${r.id}`, { state: { from: `/campus/${campusKey}` } });
+  }, [navigate, campusKey]);
 
   const handleCardClick = useCallback((r: RestaurantListItem) => {
     setSelectedId(r.id);
-    navigate(`/restaurants/${r.id}`);
-  }, [navigate]);
+    navigate(`/restaurants/${r.id}`, { state: { from: `/campus/${campusKey}` } });
+  }, [navigate, campusKey]);
 
   const handleBoundsChange = useCallback((_bounds: MapBounds) => {
     // Phase 4에서 bounds 기반 추가 조회로 확장 예정
