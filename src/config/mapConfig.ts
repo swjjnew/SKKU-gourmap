@@ -17,15 +17,15 @@ export const KAKAO_MAP_SDK_URL = (appkey: string) =>
  */
 export const CAMPUS_CENTERS = {
   natural: {
-    lat: 37.296364404283516,
-    lng: 126.9708791573265,
-    level: 2,
+    lat: 37.29661451042914,
+    lng: 126.971158202363,
+    level: 1,
     label: '자연과학캠퍼스',
   },
   humanities: {
-    lat: 37.58761640986565,
-    lng: 126.99372749860636,
-    level: 2,
+    lat: 37.58491356311817,
+    lng: 126.99714124668398,
+    level: 1,
     label: '인문사회캠퍼스',
   },
 } as const;
