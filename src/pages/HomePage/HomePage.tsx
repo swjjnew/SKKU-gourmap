@@ -112,7 +112,7 @@ function HomePage() {
               <strong className={styles.detailSectionTitle}>AI 리뷰 요약</strong>
               <p className={styles.detailSummary}>{detail.summary}</p>
               {detail.averageTrustScore != null && (
-                <p className={styles.detailTrust}>리뷰 신뢰도 {detail.averageTrustScore.toFixed(1)} / 100</p>
+                <p className={styles.detailTrust}>리뷰 신뢰도 <span className={styles.detailTrustScore}>{detail.averageTrustScore.toFixed(1)}</span> / 100</p>
               )}
             </div>
           )}
