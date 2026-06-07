@@ -20,8 +20,8 @@ const schema = z.object({
   campusSlug: z.enum(['natural', 'humanities'], { message: '캠퍼스를 선택해주세요' }),
   category:   z.string().min(1, '카테고리를 입력해주세요'),
   priceLevel: z.enum(['저렴함', '보통', '비쌈']),
-  lat:        z.coerce.number({ invalid_type_error: '숫자를 입력해주세요' }),
-  lng:        z.coerce.number({ invalid_type_error: '숫자를 입력해주세요' }),
+  lat:        z.preprocess((v) => parseFloat(String(v)), z.number()),
+  lng:        z.preprocess((v) => parseFloat(String(v)), z.number()),
   phone:      z.string().optional(),
   sourceUrl:  z.string().optional(),
   externalId: z.string().optional(),
@@ -180,7 +180,8 @@ interface ModalProps {
 
 function RestaurantModal({ target, onClose, onSubmit, isPending, error }: ModalProps) {
   const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({
-    resolver: zodResolver(schema),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(schema) as any,
     defaultValues: target ? {
       name:       target.name,
       address:    target.address,
