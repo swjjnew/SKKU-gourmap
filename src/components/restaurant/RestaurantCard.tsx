@@ -26,7 +26,6 @@ function RestaurantCard({ restaurant, selected, onClick }: RestaurantCardProps) 
     thumbnailUrl,
     tags,
     summary,
-    recommendationScore,
     recommendationReasons,
     hasAnalysis,
     address,

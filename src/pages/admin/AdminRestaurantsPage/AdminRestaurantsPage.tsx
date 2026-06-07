@@ -20,8 +20,8 @@ const schema = z.object({
   campusSlug: z.enum(['natural', 'humanities'], { message: '캠퍼스를 선택해주세요' }),
   category:   z.string().min(1, '카테고리를 입력해주세요'),
   priceLevel: z.enum(['저렴함', '보통', '비쌈']),
-  lat:        z.coerce.number(),
-  lng:        z.coerce.number(),
+  lat:        z.coerce.number({ invalid_type_error: '숫자를 입력해주세요' }),
+  lng:        z.coerce.number({ invalid_type_error: '숫자를 입력해주세요' }),
   phone:      z.string().optional(),
   sourceUrl:  z.string().optional(),
   externalId: z.string().optional(),
@@ -239,7 +239,7 @@ function RestaurantModal({ target, onClose, onSubmit, isPending, error }: ModalP
             </Field>
           </div>
 
-          {error && <p className={styles.errorMsg}>저장에 실패했습니다.</p>}
+          {!!error && <p className={styles.errorMsg}>저장에 실패했습니다.</p>}
 
           <div className={styles.modalBtns}>
             <button type="button" className={styles.cancelBtn} onClick={onClose}>취소</button>
