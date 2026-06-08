@@ -111,6 +111,7 @@ export interface RestaurantDetail {
   parkingSummary?: string;       // 주차 요약
   waitingSummary?: string;       // 웨이팅 요약
   averageTrustScore?: number;    // 평균 리뷰 신뢰도 점수 (0~100)
+  credibilityLabel?: number;     // Z-score 기준 신뢰도 등급 1~5
   recommendationScore?: number;
   recommendationReasons?: string[];
   reviewPoints?: ReviewPoint[];

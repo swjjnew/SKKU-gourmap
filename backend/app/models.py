@@ -55,6 +55,7 @@ class RestaurantSummary(Base):
     parking_summary = Column(String)
     waiting_summary = Column(String)
     average_trust_score = Column(Float, default=0)
+    credibility_label = Column(Integer, nullable=True)  # Z-score 기준 1~5
 
     restaurant = relationship("Restaurant", back_populates="summary")
 

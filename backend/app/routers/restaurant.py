@@ -30,6 +30,7 @@ def restaurant_to_frontend_item(
         "parkingSummary": r.summary.parking_summary if r.summary else None,
         "waitingSummary": r.summary.waiting_summary if r.summary else None,
         "averageTrustScore": r.summary.average_trust_score if r.summary else None,
+        "credibilityLabel": r.summary.credibility_label if r.summary else None,
 
         "tags": [
             {

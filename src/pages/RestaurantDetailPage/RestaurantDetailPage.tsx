@@ -203,6 +203,17 @@ function RestaurantDetailPage() {
                     <span className={styles.trustNote}> (참고 지표)</span>
                   </p>
                 )}
+                {r.credibilityLabel != null && (() => {
+                  const labelMap: Record<number, string> = { 1: '낮음', 2: '다소 낮음', 3: '보통', 4: '다소 높음', 5: '높음' };
+                  const label = labelMap[r.credibilityLabel!] ?? '알 수 없음';
+                  return (
+                    <div className={styles.credibilityComment}>
+                      <p>AI 리뷰 신뢰도가 <strong>"{label}"</strong>인 식당이에요.</p>
+                      <p>신뢰 점수는 음식 맛의 질이나 식당 상태를 반영하지 않아요.</p>
+                      <p>신뢰 점수는 리뷰의 솔직함만을 반영해요.</p>
+                    </div>
+                  );
+                })()}
               </section>
             )}
 

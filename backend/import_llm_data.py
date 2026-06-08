@@ -130,6 +130,8 @@ def import_summaries(db):
                 existing.parking_summary = row.get("parking_summary", "").strip()
                 existing.waiting_summary = row.get("waiting_summary", "").strip()
                 existing.average_trust_score = float(row["average_trust_score"]) if row.get("average_trust_score") else 0
+                if row.get("credibility_label"):
+                    existing.credibility_label = int(row["credibility_label"])
             else:
                 summary = RestaurantSummary(
                     restaurant_id=restaurant.id,
@@ -139,6 +141,7 @@ def import_summaries(db):
                     parking_summary=row.get("parking_summary", "").strip(),
                     waiting_summary=row.get("waiting_summary", "").strip(),
                     average_trust_score=float(row["average_trust_score"]) if row.get("average_trust_score") else 0,
+                    credibility_label=int(row["credibility_label"]) if row.get("credibility_label") else None,
                 )
 
                 db.add(summary)
