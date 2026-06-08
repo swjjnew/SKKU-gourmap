@@ -126,7 +126,7 @@ function HomePage() {
                 <p className={styles.detailTrust}>리뷰 신뢰도 <span className={styles.detailTrustScore}>{detail.averageTrustScore.toFixed(1)}</span> / 100</p>
               )}
               {detail.credibilityLabel != null && (() => {
-                const labelMap: Record<number, string> = { 1: '낮음', 2: '다소 낮음', 3: '보통', 4: '다소 높음', 5: '높음' };
+                const labelMap: Record<number, string> = { 1: '높음', 2: '다소 높음', 3: '보통', 4: '다소 낮음', 5: '낮음' };
                 const label = labelMap[detail.credibilityLabel] ?? '알 수 없음';
                 return (
                   <div className={styles.credibilityComment}>
