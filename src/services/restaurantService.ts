@@ -36,6 +36,7 @@ interface BackendRestaurant {
   parkingSummary: string | null;
   waitingSummary: string | null;
   averageTrustScore: number | null;   // 0~100
+  credibilityLabel: number | null;    // Z-score 기준 1~5
   tags: BackendTag[];
   recommendationScore: number | null;
   recommendationReasons: string[];
@@ -170,6 +171,7 @@ function toDetail(r: BackendRestaurant): RestaurantDetail {
     parkingSummary:     r.parkingSummary      ?? undefined,
     waitingSummary:     r.waitingSummary      ?? undefined,
     averageTrustScore:  r.averageTrustScore   ?? undefined,
+    credibilityLabel:   r.credibilityLabel    ?? undefined,
     reviewPoints:       undefined,   // 백엔드 미지원 (별도 분석 결과)
     analysisMetadata:   r.averageTrustScore != null
       ? {
