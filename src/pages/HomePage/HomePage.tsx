@@ -1,5 +1,4 @@
-// FR-02~07: 캠퍼스별 메인 화면 (지도 + 리스트)
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import KakaoMap, { type MapBounds } from '@components/map/KakaoMap';
@@ -25,7 +24,15 @@ function HomePage() {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [detailId, setDetailId] = useState<number | null>(null); // 사이드바 상세 표시용
 
-  const campusKey = (slug && slug in CAMPUS_CENTERS ? slug : DEFAULT_CAMPUS) as CampusSlug;
+  const isValidSlug = slug != null && slug in CAMPUS_CENTERS;
+
+  useEffect(() => {
+    if (!isValidSlug) {
+      navigate('/', { replace: true, state: { errorMessage: `'${slug}'는 유효하지 않은 캠퍼스입니다. 올바른 캠퍼스를 선택해주세요.` } });
+    }
+  }, [isValidSlug, navigate, slug]);
+
+  const campusKey = (isValidSlug ? slug : DEFAULT_CAMPUS) as CampusSlug;
   const campus = CAMPUS_CENTERS[campusKey];
 
   const { filter, setFilter, resetFilter, hasFilter, toRestaurantFilter } = useFilterParams();
@@ -77,6 +84,10 @@ function HomePage() {
   }, [viewMode, navigate, campusKey]);
 
   const handleBoundsChange = useCallback((_bounds: MapBounds) => {}, []);
+
+  const handleMapLoadError = useCallback(() => {
+    setViewMode('list');
+  }, []);
 
   const handleCloseDetail = () => {
     setDetailId(null);
@@ -264,6 +275,7 @@ function HomePage() {
                 selectedId={selectedId}
                 onMarkerClick={handleMarkerClick}
                 onBoundsChange={handleBoundsChange}
+                onLoadError={handleMapLoadError}
               />
             </ErrorBoundary>
           </section>

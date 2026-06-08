@@ -67,9 +67,6 @@ function AdminLoginPage() {
 
           {serverError && <div className={styles.serverError}>{serverError}</div>}
 
-          <div className={styles.securityNote}>
-            🔒 JWT 토큰은 메모리에만 저장됩니다 (NFR-S-01)
-          </div>
 
           <button className={styles.submitBtn} type="submit" disabled={isSubmitting}>
             {isSubmitting ? '로그인 중…' : '로그인'}

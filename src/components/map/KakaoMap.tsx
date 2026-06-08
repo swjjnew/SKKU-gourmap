@@ -30,6 +30,8 @@ interface KakaoMapProps {
   onBoundsChange?: (bounds: MapBounds) => void;
   /** 현재 선택(하이라이트)된 식당 id */
   selectedId?: number | null;
+  /** 카카오맵 SDK 로드 실패 시 콜백 */
+  onLoadError?: (error: Error) => void;
 }
 
 // ────────────────────────────────────────────
@@ -76,8 +78,15 @@ function KakaoMap({
   onMarkerClick,
   onBoundsChange,
   selectedId = null,
+  onLoadError,
 }: KakaoMapProps) {
   const { status, error } = useKakaoLoader();
+
+  useEffect(() => {
+    if (status === 'error' && error && onLoadError) {
+      onLoadError(error);
+    }
+  }, [status, error, onLoadError]);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<kakao.maps.Map | null>(null);
   const markersRef = useRef<kakao.maps.Marker[]>([]);
