@@ -1,11 +1,8 @@
 import { create } from 'zustand';
 
 interface AuthStore {
-  /** JWT 액세스 토큰 — 메모리에만 저장 (localStorage 사용 금지, NFR-S-01) */
   token: string | null;
-  /** 토큰 만료 시각 (Unix ms). null 이면 만료 정보 없음 */
   expiresAt: number | null;
-
   setToken: (token: string, expiresIn?: number) => void;
   clearToken: () => void;
   isAuthenticated: () => boolean;

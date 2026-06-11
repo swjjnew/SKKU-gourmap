@@ -15,28 +15,14 @@ export interface MapBounds {
 }
 
 interface KakaoMapProps {
-  /** 지도 중심 좌표. 미지정 시 DEFAULT_MAP_CENTER 사용. */
   center?: LatLng;
-  /** 줌 레벨 (작을수록 확대). */
   level?: number;
-  /** 표시할 식당 마커들. */
   restaurants?: RestaurantListItem[];
-  /** 마커 클릭 시 콜백. */
   onMarkerClick?: (restaurant: RestaurantListItem) => void;
-  /**
-   * 지도 영역 변경 시 콜백 (300ms debounce 적용).
-   * bounds_changed 이벤트 이후 새 bounds를 전달.
-   */
   onBoundsChange?: (bounds: MapBounds) => void;
-  /** 현재 선택(하이라이트)된 식당 id */
   selectedId?: number | null;
-  /** 카카오맵 SDK 로드 실패 시 콜백 */
   onLoadError?: (error: Error) => void;
 }
-
-// ────────────────────────────────────────────
-// 커스텀 오버레이 HTML 생성 헬퍼
-// ────────────────────────────────────────────
 
 function buildOverlayContent(r: RestaurantListItem): string {
   const score =
@@ -67,10 +53,6 @@ function buildOverlayContent(r: RestaurantListItem): string {
   `;
 }
 
-// ────────────────────────────────────────────
-// 컴포넌트
-// ────────────────────────────────────────────
-
 function KakaoMap({
   center = DEFAULT_MAP_CENTER,
   level = DEFAULT_MAP_LEVEL,
@@ -93,7 +75,6 @@ function KakaoMap({
   const clustererRef = useRef<kakao.maps.MarkerClusterer | null>(null);
   const overlayRef = useRef<kakao.maps.CustomOverlay | null>(null);
 
-  // bounds 변경 → onBoundsChange debounce 래퍼
   const debouncedBoundsChange = useDebounce(
     useCallback(
       (map: kakao.maps.Map) => {
@@ -113,7 +94,6 @@ function KakaoMap({
     300,
   );
 
-  // ── 지도 초기화 ──────────────────────────────
   useEffect(() => {
     if (status !== 'ready' || !containerRef.current) return;
     const { kakao } = window;
@@ -147,7 +127,6 @@ function KakaoMap({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
 
-  // ── center / level 변경 ───────────────────────
   useEffect(() => {
     if (!mapRef.current) return;
     mapRef.current.setCenter(
@@ -156,19 +135,16 @@ function KakaoMap({
     mapRef.current.setLevel(level);
   }, [center, level]);
 
-  // ── 오버레이 닫기 헬퍼 ───────────────────────
   const closeOverlay = useCallback(() => {
     overlayRef.current?.setMap(null);
     overlayRef.current = null;
   }, []);
 
-  // ── 마커 동기화 ──────────────────────────────
   useEffect(() => {
     if (status !== 'ready' || !mapRef.current || !clustererRef.current) return;
     const { kakao } = window;
     const map = mapRef.current;
 
-    // 기존 마커/오버레이 정리
     clustererRef.current.clear();
     markersRef.current.forEach((m) => m.setMap(null));
     markersRef.current = [];
@@ -177,7 +153,6 @@ function KakaoMap({
     const newMarkers: kakao.maps.Marker[] = [];
 
     restaurants.forEach((r) => {
-      // 선택된 마커는 강조 이미지
       const markerImage =
         r.id === selectedId
           ? new kakao.maps.MarkerImage(
@@ -192,7 +167,6 @@ function KakaoMap({
         ...(markerImage ? { image: markerImage } : {}),
       });
 
-      // 마커 클릭 → 오버레이 표시
       kakao.maps.event.addListener(marker, 'click', () => {
         closeOverlay();
 
@@ -206,7 +180,6 @@ function KakaoMap({
         overlay.setMap(map);
         overlayRef.current = overlay;
 
-        // 오버레이 내 닫기 버튼 이벤트 — DOM이 삽입된 뒤 attach
         requestAnimationFrame(() => {
           const closeBtn = (overlay.getContent() as HTMLElement)?.querySelector?.(
             '.ko-overlay-close',
@@ -223,7 +196,6 @@ function KakaoMap({
       newMarkers.push(marker);
     });
 
-    // 클러스터러에 마커 일괄 추가
     clustererRef.current.addMarkers(newMarkers);
     markersRef.current = newMarkers;
 
@@ -235,7 +207,6 @@ function KakaoMap({
     };
   }, [status, restaurants, selectedId, onMarkerClick, closeOverlay]);
 
-  // ── 렌더링 ───────────────────────────────────
   if (status === 'loading' || status === 'idle') {
     return <Loading message="지도를 불러오는 중..." />;
   }

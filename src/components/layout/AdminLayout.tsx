@@ -1,4 +1,3 @@
-// FR-12~15: 관리자 영역 공통 레이아웃 + JWT 가드
 import { NavLink, Outlet, useNavigate, Navigate } from 'react-router-dom';
 import { useAuthStore } from '@stores/authStore';
 import styles from './AdminLayout.module.css';
@@ -10,16 +9,10 @@ const NAV_ITEMS = [
   { to: '/admin/analyses',     label: '🤖 분석 관리' },
 ];
 
-/**
- * AdminLayout
- * 관리자 영역 (/admin/*) 공통 레이아웃 — JWT 가드 포함.
- * isAuthenticated() false → /admin/login 리다이렉트 (FR-12)
- */
 function AdminLayout() {
   const navigate = useNavigate();
   const { isAuthenticated, clearToken } = useAuthStore();
 
-  // ── JWT 가드 ─────────────────────────────────────────────────────
   if (!isAuthenticated()) {
     return <Navigate to="/admin/login" replace />;
   }
